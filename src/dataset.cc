@@ -10,7 +10,7 @@ using std::string;
 auto Dataset::get(int day, bool example) -> std::string {
     assert(day > 0 and day < 26);
 
-    auto path = string("C:/Users/kamil/Projekty/AdventOfCode/AoC21/dataset/");
+    auto path = string("../dataset/");
     path += example ? "example" : "puzzle";
     path += (day < 10 ? "0" : "") + std::to_string(day) + ".txt";
 
