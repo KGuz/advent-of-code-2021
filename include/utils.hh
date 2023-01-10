@@ -5,7 +5,9 @@
 #include <ranges>
 #include <sstream>
 #include <string>
+#include <numeric>
 #include <vector>
+#include <algorithm>
 
 using std::string;
 using std::vector;
@@ -18,7 +20,8 @@ using namespace std::ranges;
 }
 
 namespace {
-template <typename Iterable> class enumerate_object {
+template <typename Iterable>
+class enumerate_object {
   private:
     Iterable _iter;
     size_t _size;
@@ -26,7 +29,7 @@ template <typename Iterable> class enumerate_object {
     const decltype(std::end(_iter)) _end;
 
   public:
-    explicit enumerate_object(Iterable iter) : _iter(iter), _size(0), _begin(std::begin(iter)), _end(std::end(iter)) {}
+    enumerate_object(Iterable iter) : _iter(iter), _size(0), _begin(std::begin(iter)), _end(std::end(iter)) {}
 
     const enumerate_object &begin() const { return *this; }
     const enumerate_object &end() const { return *this; }
@@ -53,8 +56,8 @@ auto lines(const string &s) -> vector<string>;
 
 auto split_once(const string &s, char c) -> std::pair<string, string>;
 
-template <class T, class UnaryPredicate>
-auto map(const vector<T> &vec, UnaryPredicate pred) {
+template <class Iterable, class UnaryPredicate>
+auto map(const Iterable &vec, UnaryPredicate pred) {
     using result_t = std::decay_t<decltype(pred(vec[0]))>;
 
     vector<result_t> res;
