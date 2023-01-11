@@ -32,7 +32,6 @@ LIABILITY, WHETHER IN AN ACTION OF  CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-#pragma once
 
 #include <algorithm>
 #include <array>
@@ -72,7 +71,8 @@ SOFTWARE.
 #endif
 
 // Check if a type is stream writable, i.e., std::cout << foo;
-template <typename S, typename T, typename = void> struct is_to_stream_writable : std::false_type {};
+template <typename S, typename T, typename = void>
+struct is_to_stream_writable : std::false_type {};
 
 template <typename S, typename T>
 struct is_to_stream_writable<S, T, std::void_t<decltype(std::declval<S &>() << std::declval<T>())>> : std::true_type {};
@@ -81,13 +81,19 @@ struct is_to_stream_writable<S, T, std::void_t<decltype(std::declval<S &>() << s
 // The indices trick: http://loungecpp.wikidot.com/tips-and-tricks:indices
 namespace pprint {
 
-template <std::size_t...> struct seq {};
+template <std::size_t...>
+struct seq {};
 
-template <std::size_t N, std::size_t... Is> struct gen_seq : gen_seq<N - 1, N - 1, Is...> {};
+template <std::size_t N, std::size_t... Is>
+struct gen_seq : gen_seq<N - 1, N - 1, Is...> {};
 
-template <std::size_t... Is> struct gen_seq<0, Is...> : seq<Is...> {};
+template <std::size_t... Is>
+struct gen_seq<0, Is...> : seq<Is...> {};
 
-template <typename T> inline T to_string(T value) { return value; }
+template <typename T>
+inline T to_string(T value) {
+    return value;
+}
 
 inline std::string to_string(char value) { return "'" + std::string(1, value) + "'"; }
 
@@ -128,7 +134,8 @@ namespace magic_enum {
 // MAGIC_ENUM_RANGE_MAX = 128. If need another range for all enum types by default, redefine the macro
 // MAGIC_ENUM_RANGE_MAX and MAGIC_ENUM_RANGE_MIN. If need another range for specific enum type, add specialization
 // enum_range for necessary enum type.
-template <typename E> struct enum_range final {
+template <typename E>
+struct enum_range final {
     static_assert(std::is_enum_v<E>, "magic_enum::enum_range requires enum type.");
     static constexpr int min = std::is_signed_v<std::underlying_type_t<E>> ? MAGIC_ENUM_RANGE_MIN : 0;
     static constexpr int max = MAGIC_ENUM_RANGE_MAX;
@@ -144,7 +151,8 @@ static_assert(MAGIC_ENUM_RANGE_MIN > std::numeric_limits<int>::min(),
 
 namespace detail {
 
-template <typename E, typename U = std::underlying_type_t<E>> [[nodiscard]] constexpr int min_impl() {
+template <typename E, typename U = std::underlying_type_t<E>>
+[[nodiscard]] constexpr int min_impl() {
     static_assert(std::is_enum_v<E>, "magic_enum::detail::min_impl requires enum type.");
     constexpr int min =
         enum_range<E>::min > (std::numeric_limits<U>::min)() ? enum_range<E>::min : (std::numeric_limits<U>::min)();
@@ -152,7 +160,8 @@ template <typename E, typename U = std::underlying_type_t<E>> [[nodiscard]] cons
     return min;
 }
 
-template <typename E, typename U = std::underlying_type_t<E>> [[nodiscard]] constexpr decltype(auto) range_impl() {
+template <typename E, typename U = std::underlying_type_t<E>>
+[[nodiscard]] constexpr decltype(auto) range_impl() {
     static_assert(std::is_enum_v<E>, "magic_enum::detail::range_impl requires enum type.");
     static_assert(enum_range<E>::max > enum_range<E>::min, "magic_enum::enum_range requires max > min.");
     constexpr int max =
@@ -166,7 +175,8 @@ template <typename E, typename U = std::underlying_type_t<E>> [[nodiscard]] cons
     return (!front && c >= '0' && c <= '9') || (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
 }
 
-template <typename E, E V> [[nodiscard]] constexpr std::string_view name_impl() noexcept {
+template <typename E, E V>
+[[nodiscard]] constexpr std::string_view name_impl() noexcept {
     static_assert(std::is_enum_v<E>, "magic_enum::detail::name_impl requires enum type.");
 #if defined(__clang__)
     std::string_view name{__PRETTY_FUNCTION__};
@@ -206,7 +216,8 @@ template <typename E, int... I>
     return names;
 }
 
-template <typename E> [[nodiscard]] constexpr std::string_view name_impl(int value) noexcept {
+template <typename E>
+[[nodiscard]] constexpr std::string_view name_impl(int value) noexcept {
     static_assert(std::is_enum_v<E>, "magic_enum::detail::name_impl requires enum type.");
     constexpr auto names = strings_impl<E>(range_impl<E>());
     const int i = value - min_impl<E>();
@@ -244,7 +255,8 @@ template <typename E, std::size_t... I>
     return names;
 }
 
-template <typename E> [[nodiscard]] constexpr std::optional<E> enum_cast_impl(std::string_view value) noexcept {
+template <typename E>
+[[nodiscard]] constexpr std::optional<E> enum_cast_impl(std::string_view value) noexcept {
     static_assert(std::is_enum_v<E>, "magic_enum::detail::enum_cast_impl requires enum type.");
     constexpr auto values = values_impl<E>(range_impl<E>());
     constexpr auto count = values.size();
@@ -259,14 +271,17 @@ template <typename E> [[nodiscard]] constexpr std::optional<E> enum_cast_impl(st
     return std::nullopt; // Invalid value or out of range.
 }
 
-template <typename T> using enable_if_enum_t = typename std::enable_if<std::is_enum_v<T>>::type;
+template <typename T>
+using enable_if_enum_t = typename std::enable_if<std::is_enum_v<T>>::type;
 
-template <typename T, bool = std::is_enum_v<T>> struct is_scoped_enum_impl : std::false_type {};
+template <typename T, bool = std::is_enum_v<T>>
+struct is_scoped_enum_impl : std::false_type {};
 
 template <typename T>
 struct is_scoped_enum_impl<T, true> : std::bool_constant<!std::is_convertible_v<T, std::underlying_type_t<T>>> {};
 
-template <typename T, bool = std::is_enum_v<T>> struct is_unscoped_enum_impl : std::false_type {};
+template <typename T, bool = std::is_enum_v<T>>
+struct is_unscoped_enum_impl : std::false_type {};
 
 template <typename T>
 struct is_unscoped_enum_impl<T, true> : std::bool_constant<std::is_convertible_v<T, std::underlying_type_t<T>>> {};
@@ -277,17 +292,21 @@ struct is_unscoped_enum_impl<T, true> : std::bool_constant<std::is_convertible_v
 // Provides the member constant value which is equal to true, if T is an [Unscoped
 // enumeration](https://en.cppreference.com/w/cpp/language/enum#Unscoped_enumeration) type. Otherwise, value is equal to
 // false.
-template <typename T> struct is_unscoped_enum : detail::is_unscoped_enum_impl<T> {};
+template <typename T>
+struct is_unscoped_enum : detail::is_unscoped_enum_impl<T> {};
 
-template <typename T> inline constexpr bool is_unscoped_enum_v = is_unscoped_enum<T>::value;
+template <typename T>
+inline constexpr bool is_unscoped_enum_v = is_unscoped_enum<T>::value;
 
 // Checks whether T is an Scoped enumeration type.
 // Provides the member constant value which is equal to true, if T is an [Scoped
 // enumeration](https://en.cppreference.com/w/cpp/language/enum#Scoped_enumerations) type. Otherwise, value is equal to
 // false.
-template <typename T> struct is_scoped_enum : detail::is_scoped_enum_impl<T> {};
+template <typename T>
+struct is_scoped_enum : detail::is_scoped_enum_impl<T> {};
 
-template <typename T> inline constexpr bool is_scoped_enum_v = is_scoped_enum<T>::value;
+template <typename T>
+inline constexpr bool is_scoped_enum_v = is_scoped_enum<T>::value;
 
 // Obtains enum value from enum string name.
 template <typename E, typename = detail::enable_if_enum_t<E>>
@@ -311,7 +330,8 @@ template <typename E, typename = detail::enable_if_enum_t<E>>
 
 // Returns enum value at specified index.
 // No bounds checking is performed: the behavior is undefined if index >= number of enum values.
-template <typename E, typename = detail::enable_if_enum_t<E>> [[nodiscard]] constexpr E enum_value(std::size_t index) {
+template <typename E, typename = detail::enable_if_enum_t<E>>
+[[nodiscard]] constexpr E enum_value(std::size_t index) {
     static_assert(std::is_enum_v<E>, "magic_enum::enum_value requires enum type.");
     constexpr auto values = detail::values_impl<E>(detail::range_impl<E>());
 
@@ -394,21 +414,24 @@ std::ostream &operator<<(std::ostream &os, std::optional<E> value) {
 namespace pprint {
 
 // Some utility structs to check template specialization
-template <typename Test, template <typename...> class Ref> struct is_specialization : std::false_type {};
+template <typename Test, template <typename...> class Ref>
+struct is_specialization : std::false_type {};
 
 template <template <typename...> class Ref, typename... Args>
 struct is_specialization<Ref<Args...>, Ref> : std::true_type {};
 
-template <typename...> using to_void = void;
+template <typename...>
+using to_void = void;
 
-template <typename T, typename = void> struct is_container : std::false_type {};
+template <typename T, typename = void>
+struct is_container : std::false_type {};
 
 template <typename T>
 struct is_container<T, to_void<decltype(std::declval<T>().begin()), decltype(std::declval<T>().end()),
                                typename T::value_type>> : std::true_type // will  be enabled for iterable objects
 {};
 
-class PrettyPrinter {
+export class PrettyPrinter {
   private:
     std::ostream &stream_;
     std::string line_terminator_;
@@ -417,7 +440,7 @@ class PrettyPrinter {
     bool compact_;
 
   public:
-    PrettyPrinter(std::ostream &stream = std::cout)
+    explicit PrettyPrinter(std::ostream &stream = std::cout)
         : stream_(stream), line_terminator_("\n"), indent_(2), quotes_(false), compact_(false) {}
 
     PrettyPrinter &line_terminator(const std::string &value) {
@@ -440,11 +463,18 @@ class PrettyPrinter {
         return *this;
     }
 
-    template <typename T> void print(T value) { print_internal(value, 0, line_terminator_, 0); }
+    template <typename T>
+    void print(T value) {
+        print_internal(value, 0, line_terminator_, 0);
+    }
 
-    template <typename T> void print(std::initializer_list<T> value) { print_internal(value, 0, line_terminator_, 0); }
+    template <typename T>
+    void print(std::initializer_list<T> value) {
+        print_internal(value, 0, line_terminator_, 0);
+    }
 
-    template <typename T, typename... Targs> void print(T value, Targs... Fargs) {
+    template <typename T, typename... Targs>
+    void print(T value, Targs... Fargs) {
         print_internal(value, 0, "", 0);
         auto current_quotes = quotes_;
         quotes_ = false;
@@ -453,11 +483,18 @@ class PrettyPrinter {
         print(Fargs...);
     }
 
-    template <typename T> void print_inline(T value) { print_internal(value, indent_, "", 0); }
+    template <typename T>
+    void print_inline(T value) {
+        print_internal(value, indent_, "", 0);
+    }
 
-    template <typename T> void print_inline(std::initializer_list<T> value) { print_internal(value, indent_, "", 0); }
+    template <typename T>
+    void print_inline(std::initializer_list<T> value) {
+        print_internal(value, indent_, "", 0);
+    }
 
-    template <typename T, typename... Targs> void print_inline(T value, Targs... Fargs) {
+    template <typename T, typename... Targs>
+    void print_inline(T value, Targs... Fargs) {
         print_internal(value, indent_, "", 0);
         auto current_quotes = quotes_;
         quotes_ = false;
@@ -489,25 +526,28 @@ class PrettyPrinter {
 
     void print_internal(const std::string &value, size_t indent = 0, const std::string &line_terminator = "\n",
                         size_t level = 0) {
-        if (!quotes_)
+        if (!quotes_) {
             print_internal_without_quotes(value, indent, line_terminator, level);
-        else
+        } else {
             stream_ << std::string(indent, ' ') << "\"" << value << "\"" << line_terminator;
+        }
     }
 
     void print_internal(const char *value, size_t indent = 0, const std::string &line_terminator = "\n",
                         size_t level = 0) {
-        if (!quotes_)
+        if (!quotes_) {
             print_internal_without_quotes(value, indent, line_terminator, level);
-        else
+        } else {
             stream_ << std::string(indent, ' ') << "\"" << value << "\"" << line_terminator;
+        }
     }
 
     void print_internal(char value, size_t indent = 0, const std::string &line_terminator = "\n", size_t level = 0) {
-        if (!quotes_)
+        if (!quotes_) {
             print_internal_without_quotes(value, indent, line_terminator, level);
-        else
+        } else {
             stream_ << std::string(indent, ' ') << "'" << value << "'" << line_terminator;
+        }
     }
 
     void print_internal_without_quotes(const std::string &value, size_t indent = 0,
@@ -548,7 +588,10 @@ class PrettyPrinter {
 #endif
     }
 
-    template <class T> std::string type(const T &t) { return demangle(typeid(t).name()); }
+    template <class T>
+    std::string type(const T &t) {
+        return demangle(typeid(t).name());
+    }
 
     template <typename T>
     typename std::enable_if<std::is_enum<T>::value == true, void>::type
@@ -626,27 +669,30 @@ class PrettyPrinter {
             } else if (value.size() > 0) {
                 print_internal_without_quotes("[", 0, "\n");
                 print_internal(value.front(), indent + indent_, "", level + 1);
-                if (value.size() > 1 && is_container<T>::value == false)
+                if (value.size() > 1 && is_container<T>::value == false) {
                     print_internal_without_quotes(", ", 0, "\n");
-                else if (is_container<T>::value)
+                } else if (is_container<T>::value) {
                     print_internal_without_quotes(", ", 0, "\n");
+                }
                 for (size_t i = 1; i < value.size() - 1; i++) {
                     print_internal(value[i], indent + indent_, "", level + 1);
-                    if (is_container<T>::value == false)
+                    if (is_container<T>::value == false) {
                         print_internal_without_quotes(", ", 0, "\n");
-                    else
+                    } else {
                         print_internal_without_quotes(", ", 0, "\n");
+                    }
                 }
                 if (value.size() > 1) {
                     print_internal(value.back(), indent + indent_, "\n", level + 1);
                 }
             }
-            if (value.size() == 0)
+            if (value.size() == 0) {
                 print_internal_without_quotes("]", indent, "");
-            else if (is_container<T>::value == false)
+            } else if (is_container<T>::value == false) {
                 print_internal_without_quotes("]", indent, "");
-            else
+            } else {
                 print_internal_without_quotes(line_terminator_ + "]", indent, "");
+            }
             print_internal_without_quotes(line_terminator_, 0, "");
         } else {
             if (value.size() == 0) {
@@ -657,8 +703,9 @@ class PrettyPrinter {
             } else if (value.size() > 0) {
                 print_internal_without_quotes("[", indent, "");
                 print_internal(value.front(), 0, "", level + 1);
-                if (value.size() > 1)
+                if (value.size() > 1) {
                     print_internal_without_quotes(", ", 0, "");
+                }
                 for (size_t i = 1; i < value.size() - 1; i++) {
                     print_internal(value[i], 0, "", level + 1);
                     print_internal_without_quotes(", ", 0, "");
@@ -668,8 +715,9 @@ class PrettyPrinter {
                 }
             }
             print_internal_without_quotes("]", 0, "");
-            if (level == 0 && compact_)
+            if (level == 0 && compact_) {
                 print_internal_without_quotes(line_terminator_, 0, "");
+            }
         }
     }
 
@@ -685,27 +733,30 @@ class PrettyPrinter {
             } else if (value.size() > 0) {
                 print_internal_without_quotes("[", 0, "\n");
                 print_internal(value.front(), indent + indent_, "", level + 1);
-                if (value.size() > 1 && is_container<T>::value == false)
+                if (value.size() > 1 && is_container<T>::value == false) {
                     print_internal_without_quotes(", ", 0, "\n");
-                else if (is_container<T>::value)
+                } else if (is_container<T>::value) {
                     print_internal_without_quotes(", ", 0, "\n");
+                }
                 for (size_t i = 1; i < value.size() - 1; i++) {
                     print_internal(value[i], indent + indent_, "", level + 1);
-                    if (is_container<T>::value == false)
+                    if (is_container<T>::value == false) {
                         print_internal_without_quotes(", ", 0, "\n");
-                    else
+                    } else {
                         print_internal_without_quotes(", ", 0, "\n");
+                    }
                 }
                 if (value.size() > 1) {
                     print_internal(value.back(), indent + indent_, "\n", level + 1);
                 }
             }
-            if (value.size() == 0)
+            if (value.size() == 0) {
                 print_internal_without_quotes("]", indent, "");
-            else if (is_container<T>::value == false)
+            } else if (is_container<T>::value == false) {
                 print_internal_without_quotes("]", indent, "");
-            else
+            } else {
                 print_internal_without_quotes(line_terminator_ + "]", indent, "");
+            }
             print_internal_without_quotes(line_terminator_, 0, "");
         } else {
             if (value.size() == 0) {
@@ -716,8 +767,9 @@ class PrettyPrinter {
             } else if (value.size() > 0) {
                 print_internal_without_quotes("[", indent, "");
                 print_internal(value.front(), 0, "", level + 1);
-                if (value.size() > 1)
+                if (value.size() > 1) {
                     print_internal_without_quotes(", ", 0, "");
+                }
                 for (size_t i = 1; i < value.size() - 1; i++) {
                     print_internal(value[i], 0, "", level + 1);
                     print_internal_without_quotes(", ", 0, "");
@@ -727,8 +779,9 @@ class PrettyPrinter {
                 }
             }
             print_internal_without_quotes("]", 0, "");
-            if (level == 0 && compact_)
+            if (level == 0 && compact_) {
                 print_internal_without_quotes(line_terminator_, 0, "");
+            }
         }
     }
 
@@ -747,30 +800,33 @@ class PrettyPrinter {
             } else if (value.size() > 0) {
                 print_internal_without_quotes("[", 0, "\n");
                 print_internal(value.front(), indent + indent_, "", level + 1);
-                if (value.size() > 1 && is_container<T>::value == false)
+                if (value.size() > 1 && is_container<T>::value == false) {
                     print_internal_without_quotes(", ", 0, "\n");
-                else if (is_container<T>::value)
+                } else if (is_container<T>::value) {
                     print_internal_without_quotes(", ", 0, "\n");
+                }
 
                 typename Container::const_iterator iterator;
                 for (iterator = std::next(value.begin()); iterator != std::prev(value.end()); ++iterator) {
                     print_internal(*iterator, indent + indent_, "", level + 1);
-                    if (is_container<T>::value == false)
+                    if (is_container<T>::value == false) {
                         print_internal_without_quotes(", ", 0, "\n");
-                    else
+                    } else {
                         print_internal_without_quotes(", ", 0, "\n");
+                    }
                 }
 
                 if (value.size() > 1) {
                     print_internal(value.back(), indent + indent_, "\n", level + 1);
                 }
             }
-            if (value.size() == 0)
+            if (value.size() == 0) {
                 print_internal_without_quotes("]", indent, "");
-            else if (is_container<T>::value == false)
+            } else if (is_container<T>::value == false) {
                 print_internal_without_quotes("]", indent, "");
-            else
+            } else {
                 print_internal_without_quotes(line_terminator_ + "]", indent, "");
+            }
             print_internal_without_quotes(line_terminator_, 0, "");
         } else {
             if (value.size() == 0) {
@@ -781,8 +837,9 @@ class PrettyPrinter {
             } else if (value.size() > 0) {
                 print_internal_without_quotes("[", indent, "");
                 print_internal(value.front(), 0, "", level + 1);
-                if (value.size() > 1)
+                if (value.size() > 1) {
                     print_internal_without_quotes(", ", 0, "");
+                }
 
                 typename Container::const_iterator iterator;
                 for (iterator = std::next(value.begin()); iterator != std::prev(value.end()); ++iterator) {
@@ -795,8 +852,9 @@ class PrettyPrinter {
                 }
             }
             print_internal_without_quotes("]", 0, "");
-            if (level == 0 && compact_)
+            if (level == 0 && compact_) {
                 print_internal_without_quotes(line_terminator_, 0, "");
+            }
         }
     }
 
@@ -818,31 +876,34 @@ class PrettyPrinter {
             } else {
                 print_internal_without_quotes("{", 0, "\n");
                 print_internal(*(value.begin()), indent + indent_, "", level + 1);
-                if (value.size() > 1 && is_container<T>::value == false)
+                if (value.size() > 1 && is_container<T>::value == false) {
                     print_internal_without_quotes(", ", 0, "\n");
-                else if (is_container<T>::value)
+                } else if (is_container<T>::value) {
                     print_internal_without_quotes(", ", 0, "\n");
+                }
 
                 typename Container::const_iterator iterator;
                 for (iterator = std::next(value.begin());
                      (iterator != value.end()) && (std::next(iterator) != value.end()); ++iterator) {
                     print_internal(*iterator, indent + indent_, "", level + 1);
-                    if (is_container<T>::value == false)
+                    if (is_container<T>::value == false) {
                         print_internal_without_quotes(", ", 0, "\n");
-                    else
+                    } else {
                         print_internal_without_quotes(", ", 0, "\n");
+                    }
                 }
 
                 if (value.size() > 1) {
                     print_internal(*iterator, indent + indent_, "\n", level + 1);
                 }
             }
-            if (value.size() == 0)
+            if (value.size() == 0) {
                 print_internal_without_quotes("}", indent, "");
-            else if (is_container<T>::value == false)
+            } else if (is_container<T>::value == false) {
                 print_internal_without_quotes("}", indent, "");
-            else
+            } else {
                 print_internal_without_quotes(line_terminator_ + "}", indent, "");
+            }
             print_internal_without_quotes(line_terminator_, 0, "");
         } else {
             if (value.size() == 0) {
@@ -853,8 +914,9 @@ class PrettyPrinter {
             } else {
                 print_internal_without_quotes("{", indent, "");
                 print_internal(*(value.begin()), 0, "", level + 1);
-                if (value.size() > 1)
+                if (value.size() > 1) {
                     print_internal_without_quotes(", ", 0, "");
+                }
 
                 typename Container::const_iterator iterator;
                 for (iterator = std::next(value.begin());
@@ -868,8 +930,9 @@ class PrettyPrinter {
                 }
             }
             print_internal_without_quotes("}", 0, "");
-            if (level == 0 && compact_)
+            if (level == 0 && compact_) {
                 print_internal_without_quotes(line_terminator_, 0, "");
+            }
         }
     }
 
@@ -899,18 +962,20 @@ class PrettyPrinter {
                         print_internal(kvpair.first, indent + indent_, "", level + 1);
                         print_internal_without_quotes(" : ", 0, "");
                         print_internal(kvpair.second, 0, "", level + 1);
-                        if (value.size() > 1 && is_container<Value>::value == false)
+                        if (value.size() > 1 && is_container<Value>::value == false) {
                             print_internal_without_quotes(", ", 0, "\n");
-                        else if (is_container<Value>::value)
+                        } else if (is_container<Value>::value) {
                             print_internal_without_quotes(", ", 0, "\n");
+                        }
                     } else if (count + 1 < value.size()) {
                         print_internal(kvpair.first, indent + indent_, "", level + 1);
                         print_internal_without_quotes(" : ", 0, "");
                         print_internal(kvpair.second, 0, "", level + 1);
-                        if (is_container<Value>::value == false)
+                        if (is_container<Value>::value == false) {
                             print_internal_without_quotes(", ", 0, "\n");
-                        else
+                        } else {
                             print_internal_without_quotes(", ", 0, "\n");
+                        }
                     } else {
                         print_internal(kvpair.first, indent + indent_, "", level + 1);
                         print_internal_without_quotes(" : ", 0, "");
@@ -919,12 +984,13 @@ class PrettyPrinter {
                     count += 1;
                 }
             }
-            if (value.size() == 0)
+            if (value.size() == 0) {
                 print_internal_without_quotes("}", indent, "");
-            else if (is_container<Value>::value == false)
+            } else if (is_container<Value>::value == false) {
                 print_internal_without_quotes("}", indent, "");
-            else
+            } else {
                 print_internal_without_quotes(line_terminator_ + "}", indent, "");
+            }
             print_internal_without_quotes(line_terminator_, 0, "");
         } else {
             if (value.size() == 0) {
@@ -959,8 +1025,9 @@ class PrettyPrinter {
                 }
             }
             print_internal_without_quotes("}", 0, "");
-            if (level == 0 && compact_)
+            if (level == 0 && compact_) {
                 print_internal_without_quotes(line_terminator_, 0, "");
+            }
         }
     }
 
@@ -1073,5 +1140,4 @@ class PrettyPrinter {
         stream_ << std::string(indent, ' ') << "<" << type(value) << " at " << &value << ">" << line_terminator;
     }
 };
-
 } // namespace pprint

@@ -1,5 +1,3 @@
 cmake-build-debug
 dataset/puzzle*
-.clang-format
-.clang-tidy
 .idea
