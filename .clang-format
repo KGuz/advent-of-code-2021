@@ -5,3 +5,4 @@ ColumnLimit: 120
 AlwaysBreakTemplateDeclarations: Yes
 AllowShortCaseLabelsOnASingleLine: true
 InsertBraces: true
+IndentCaseLabels: true

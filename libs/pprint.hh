@@ -1,5 +1,5 @@
 /*
- _______  _______  ______    ___   __    _  _______
+_______  _______  ______    ___   __    _  _______
 |       ||       ||    _ |  |   | |  |  | ||       |
 |    _  ||    _  ||   | ||  |   | |   |_| ||_     _|
 |   |_| ||   |_| ||   |_||_ |   | |       |  |   |
@@ -32,7 +32,7 @@ LIABILITY, WHETHER IN AN ACTION OF  CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE  OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
 */
-
+#pragma once
 #include <algorithm>
 #include <array>
 #include <cassert>
@@ -63,7 +63,6 @@ SOFTWARE.
 #include <utility>
 #include <variant>
 #include <vector>
-
 #ifdef __GNUG__
 #include <cstdlib>
 #include <cxxabi.h>
@@ -431,7 +430,7 @@ struct is_container<T, to_void<decltype(std::declval<T>().begin()), decltype(std
                                typename T::value_type>> : std::true_type // will  be enabled for iterable objects
 {};
 
-export class PrettyPrinter {
+class PrettyPrinter {
   private:
     std::ostream &stream_;
     std::string line_terminator_;
@@ -440,7 +439,7 @@ export class PrettyPrinter {
     bool compact_;
 
   public:
-    explicit PrettyPrinter(std::ostream &stream = std::cout)
+    PrettyPrinter(std::ostream &stream = std::cout)
         : stream_(stream), line_terminator_("\n"), indent_(2), quotes_(false), compact_(false) {}
 
     PrettyPrinter &line_terminator(const std::string &value) {
@@ -992,7 +991,9 @@ export class PrettyPrinter {
                 print_internal_without_quotes(line_terminator_ + "}", indent, "");
             }
             print_internal_without_quotes(line_terminator_, 0, "");
-        } else {
+        }
+
+        else {
             if (value.size() == 0) {
                 print_internal_without_quotes("{", indent, "");
             } else if (value.size() == 1) {

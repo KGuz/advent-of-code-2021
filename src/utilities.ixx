@@ -1,10 +1,9 @@
 module;
+#include "pprint.hh"
 #include <algorithm>
 #include <sstream>
 #include <string>
 #include <vector>
-#include "pprint.hh"
-
 export module utilities;
 
 using std::string, std::vector;
@@ -43,12 +42,12 @@ inline auto parse(const string &str) -> T {
 }
 
 template <class Iterable, class Predicate>
-auto map(const Iterable &vec, Predicate pred) {
-    using result_t = std::decay_t<decltype(pred(vec[0]))>;
+auto map(const Iterable &iter, Predicate pred) {
+    using result_t = std::decay_t<decltype(pred(iter[0]))>;
 
     vector<result_t> res;
-    res.reserve(vec.size());
-    std::transform(vec.begin(), vec.end(), std::back_inserter(res), pred);
+    res.reserve(iter.size());
+    std::transform(iter.begin(), iter.end(), std::back_inserter(res), pred);
     return res;
 }
 
@@ -68,7 +67,7 @@ auto lines(const string &s) -> vector<string> {
     auto lines = vector<string>{};
     auto ss = std::stringstream(s);
 
-    for (string line; std::getline(ss, line, '\n');) {
+    for (string line; std::getline(ss, line);) {
         lines.push_back(rtrim(std::move(line)));
     }
     return lines;

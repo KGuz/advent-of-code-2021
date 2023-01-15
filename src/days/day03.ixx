@@ -3,7 +3,6 @@ module;
 #include <algorithm>
 #include <numeric>
 #include <ranges>
-#include <string>
 #include <vector>
 
 export module day03;
@@ -38,12 +37,11 @@ auto least_common_bits(const vector<vector<bool>> &bitsets) -> vector<bool> {
 template <class Predicate>
 auto reduce_common_bits(const vector<vector<bool>> &bitsets, Predicate pred) -> vector<bool> {
     auto res = vector<vector<bool>>(bitsets);
-    for (auto n = 0; res.size() > 1; ++n) {
-        auto common_bits = pred(res);
-        auto filtered =
-            res | std::views::filter([n, &common_bits](const auto &bits) { return bits[n] == common_bits[n]; });
-        res = vector<vector<bool>>{filtered.begin(), filtered.end()};
-    }
+//    for (auto n = 0; res.size() > 1; ++n) {
+//        auto common_bits = pred(res);
+//        auto filtered = res | std::views::filter([n, &common_bits](const auto &bits) { return bits[n] == common_bits[n]; });
+//        res = vector<vector<bool>>{filtered.begin(), filtered.end()};
+//    }
     return res[0];
 }
 

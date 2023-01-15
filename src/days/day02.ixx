@@ -1,6 +1,5 @@
 module;
 #include "puzzle.hh"
-#include <string>
 
 export module day02;
 import utilities;

@@ -1,49 +1,51 @@
 cmake_minimum_required(VERSION 3.24)
-
 project(AoC21)
+
 set(CMAKE_CXX_STANDARD 23)
 
-set(SOURCES
-        src/dataset.ixx
-        src/advent/advent.ixx
-        src/parser.ixx
-        src/main.cc
+add_library(Utl
+        src/utilities.ixx
         )
+target_include_directories(Utl PUBLIC libs)
+target_link_directories(Utl PUBLIC libs)
 
-set(DAYS
-        src/advent/puzzle.hh
-        src/advent/day01.ixx
-        src/advent/day02.ixx
-        src/advent/day03.ixx
-        src/advent/day04.ixx
-        src/advent/day05.ixx
-        src/advent/day06.ixx
-        src/advent/day07.ixx
-        src/advent/day08.ixx
-        src/advent/day09.ixx
-        src/advent/day10.ixx
-        src/advent/day11.ixx
-        src/advent/day12.ixx
-        src/advent/day13.ixx
-        src/advent/day14.ixx
-        src/advent/day15.ixx
-        src/advent/day16.ixx
-        src/advent/day17.ixx
-        src/advent/day18.ixx
-        src/advent/day19.ixx
-        src/advent/day20.ixx
-        src/advent/day21.ixx
-        src/advent/day22.ixx
-        src/advent/day23.ixx
-        src/advent/day24.ixx
-        src/advent/day25.ixx
+add_library(Days
+        src/days/day01.ixx
+        src/days/day02.ixx
+        src/days/day03.ixx
+        src/days/day04.ixx
+        src/days/day05.ixx
+        src/days/day06.ixx
+        src/days/day07.ixx
+        src/days/day08.ixx
+        src/days/day09.ixx
+        src/days/day10.ixx
+        src/days/day11.ixx
+        src/days/day12.ixx
+        src/days/day13.ixx
+        src/days/day14.ixx
+        src/days/day15.ixx
+        src/days/day16.ixx
+        src/days/day17.ixx
+        src/days/day18.ixx
+        src/days/day19.ixx
+        src/days/day20.ixx
+        src/days/day21.ixx
+        src/days/day22.ixx
+        src/days/day23.ixx
+        src/days/day24.ixx
+        src/days/day25.ixx
         )
-
-include_directories(libs)
+target_include_directories(Days PUBLIC src)
+target_link_directories(Days PUBLIC src)
+target_link_libraries(Days PUBLIC Utl)
 
 add_executable(AoC21
-        libs/pprint.hh
-        src/utilities.ixx
-        ${DAYS}
-        ${SOURCES}
+        src/advent.ixx
+        src/args.ixx
+        src/dataset.ixx
+        src/main.cc
         )
+target_include_directories(AoC21 PUBLIC libs src src/days)
+target_link_directories(AoC21 PUBLIC libs src src/days)
+target_link_libraries(AoC21 PUBLIC Utl Days)

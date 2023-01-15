@@ -2,19 +2,18 @@
 #include <iostream>
 
 import advent;
-import dataset;
 import args;
-
-using std::format, std::cout, std::endl;
+import dataset;
+import utilities;
 
 auto main(int argc, char **argv) -> int {
-    auto [day, example] = Args::parse(argc, argv);
-    auto input = Dataset::get(day, example);
-    auto puzzle = Advent::get(day);
+    auto [day, example] = args::parse(argc, argv);
+    auto input = dataset::input(day, example);
+    auto puzzle = advent::puzzle(day);
 
-    cout << format("{:*^60}", format(" Advent of Code 2021 - Day {} ", day)) << endl;
+    utl::print(std::format("{:*^60}", std::format(" Advent of Code 2021 - Day {} ", day)));
     auto [part_one, part_two] = puzzle->solve(input);
-    cout << format("Part one {:.>51}", part_one) << endl;
-    cout << format("Part two {:.>51}", part_two) << endl;
+    utl::print(std::format("Part one {:.>51}", part_one));
+    utl::print(std::format("Part two {:.>51}", part_two));
     return 0;
 }
