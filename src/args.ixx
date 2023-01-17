@@ -4,7 +4,7 @@ module;
 export module args;
 
 export namespace args {
-auto parse(int argc, char **argv) -> std::pair<int, bool> {
+auto parse(int argc, char** argv) -> std::pair<int, bool> {
     auto options = cxxopts::Options("AoC21", "Solver of 2021 Advent of Code Puzzles");
     options.add_options()
         ("d,day", "Advent day number (1-25)", cxxopts::value<int>())

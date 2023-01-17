@@ -6,3 +6,5 @@ AlwaysBreakTemplateDeclarations: Yes
 AllowShortCaseLabelsOnASingleLine: true
 InsertBraces: true
 IndentCaseLabels: true
+AccessModifierOffset: -4
+PointerAlignment: Left

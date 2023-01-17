@@ -74,7 +74,7 @@ template <typename S, typename T, typename = void>
 struct is_to_stream_writable : std::false_type {};
 
 template <typename S, typename T>
-struct is_to_stream_writable<S, T, std::void_t<decltype(std::declval<S &>() << std::declval<T>())>> : std::true_type {};
+struct is_to_stream_writable<S, T, std::void_t<decltype(std::declval<S&>() << std::declval<T>())>> : std::true_type {};
 
 // Printing std::tuple
 // The indices trick: http://loungecpp.wikidot.com/tips-and-tricks:indices
@@ -96,12 +96,12 @@ inline T to_string(T value) {
 
 inline std::string to_string(char value) { return "'" + std::string(1, value) + "'"; }
 
-inline std::string to_string(const char *value) { return "\"" + std::string(value) + "\""; }
+inline std::string to_string(const char* value) { return "\"" + std::string(value) + "\""; }
 
-inline std::string to_string(const std::string &value) { return "\"" + value + "\""; }
+inline std::string to_string(const std::string& value) { return "\"" + value + "\""; }
 
 template <class Ch, class Tr, class Tuple, std::size_t... Is>
-void print_tuple(std::basic_ostream<Ch, Tr> &os, Tuple const &t, seq<Is...>) {
+void print_tuple(std::basic_ostream<Ch, Tr>& os, Tuple const& t, seq<Is...>) {
     using swallow = int[];
     (void)swallow{0, (void(os << (Is == 0 ? "" : ", ") << to_string(std::get<Is>(t))), 0)...};
 }
@@ -109,7 +109,7 @@ void print_tuple(std::basic_ostream<Ch, Tr> &os, Tuple const &t, seq<Is...>) {
 } // namespace pprint
 
 template <class Ch, class Tr, class... Args>
-auto operator<<(std::basic_ostream<Ch, Tr> &os, std::tuple<Args...> const &t) -> std::basic_ostream<Ch, Tr> & {
+auto operator<<(std::basic_ostream<Ch, Tr>& os, std::tuple<Args...> const& t) -> std::basic_ostream<Ch, Tr>& {
     os << "(";
     pprint::print_tuple(os, t, pprint::gen_seq<sizeof...(Args)>());
     return os << ")";
@@ -381,7 +381,7 @@ template <typename E, typename = detail::enable_if_enum_t<E>>
 namespace ops {
 
 template <typename E, typename D = std::decay_t<E>, typename = detail::enable_if_enum_t<E>>
-std::ostream &operator<<(std::ostream &os, E value) {
+std::ostream& operator<<(std::ostream& os, E value) {
     static_assert(std::is_enum_v<D>, "magic_enum::ops::operator<< requires enum type.");
     const auto name = detail::name_impl<D>(static_cast<int>(value));
 
@@ -393,7 +393,7 @@ std::ostream &operator<<(std::ostream &os, E value) {
 }
 
 template <typename E, typename = detail::enable_if_enum_t<E>>
-std::ostream &operator<<(std::ostream &os, std::optional<E> value) {
+std::ostream& operator<<(std::ostream& os, std::optional<E> value) {
     static_assert(std::is_enum_v<E>, "magic_enum::ops::operator<< requires enum type.");
 
     if (value.has_value()) {
@@ -431,33 +431,33 @@ struct is_container<T, to_void<decltype(std::declval<T>().begin()), decltype(std
 {};
 
 class PrettyPrinter {
-  private:
-    std::ostream &stream_;
+private:
+    std::ostream& stream_;
     std::string line_terminator_;
     size_t indent_;
     bool quotes_;
     bool compact_;
 
-  public:
-    PrettyPrinter(std::ostream &stream = std::cout)
+public:
+    PrettyPrinter(std::ostream& stream = std::cout)
         : stream_(stream), line_terminator_("\n"), indent_(2), quotes_(false), compact_(false) {}
 
-    PrettyPrinter &line_terminator(const std::string &value) {
+    PrettyPrinter& line_terminator(const std::string& value) {
         line_terminator_ = value;
         return *this;
     }
 
-    PrettyPrinter &indent(size_t indent) {
+    PrettyPrinter& indent(size_t indent) {
         indent_ = indent;
         return *this;
     }
 
-    PrettyPrinter &compact(bool value) {
+    PrettyPrinter& compact(bool value) {
         compact_ = value;
         return *this;
     }
 
-    PrettyPrinter &quotes(bool value) {
+    PrettyPrinter& quotes(bool value) {
         quotes_ = value;
         return *this;
     }
@@ -502,28 +502,28 @@ class PrettyPrinter {
         print_inline(Fargs...);
     }
 
-  private:
+private:
     template <typename T>
     typename std::enable_if<std::is_integral<T>::value == true, void>::type
-    print_internal(T value, size_t indent = 0, const std::string &line_terminator = "\n", size_t level = 0) {
+    print_internal(T value, size_t indent = 0, const std::string& line_terminator = "\n", size_t level = 0) {
         stream_ << std::string(indent, ' ') << value << line_terminator;
     }
 
     template <typename T>
     typename std::enable_if<std::is_null_pointer<T>::value == true, void>::type
-    print_internal(T value, size_t indent = 0, const std::string &line_terminator = "\n", size_t level = 0) {
+    print_internal(T value, size_t indent = 0, const std::string& line_terminator = "\n", size_t level = 0) {
         stream_ << std::string(indent, ' ') << "nullptr" << line_terminator;
     }
 
-    void print_internal(float value, size_t indent = 0, const std::string &line_terminator = "\n", size_t level = 0) {
+    void print_internal(float value, size_t indent = 0, const std::string& line_terminator = "\n", size_t level = 0) {
         stream_ << std::string(indent, ' ') << value << 'f' << line_terminator;
     }
 
-    void print_internal(double value, size_t indent = 0, const std::string &line_terminator = "\n", size_t level = 0) {
+    void print_internal(double value, size_t indent = 0, const std::string& line_terminator = "\n", size_t level = 0) {
         stream_ << std::string(indent, ' ') << value << line_terminator;
     }
 
-    void print_internal(const std::string &value, size_t indent = 0, const std::string &line_terminator = "\n",
+    void print_internal(const std::string& value, size_t indent = 0, const std::string& line_terminator = "\n",
                         size_t level = 0) {
         if (!quotes_) {
             print_internal_without_quotes(value, indent, line_terminator, level);
@@ -532,7 +532,7 @@ class PrettyPrinter {
         }
     }
 
-    void print_internal(const char *value, size_t indent = 0, const std::string &line_terminator = "\n",
+    void print_internal(const char* value, size_t indent = 0, const std::string& line_terminator = "\n",
                         size_t level = 0) {
         if (!quotes_) {
             print_internal_without_quotes(value, indent, line_terminator, level);
@@ -541,7 +541,7 @@ class PrettyPrinter {
         }
     }
 
-    void print_internal(char value, size_t indent = 0, const std::string &line_terminator = "\n", size_t level = 0) {
+    void print_internal(char value, size_t indent = 0, const std::string& line_terminator = "\n", size_t level = 0) {
         if (!quotes_) {
             print_internal_without_quotes(value, indent, line_terminator, level);
         } else {
@@ -549,38 +549,38 @@ class PrettyPrinter {
         }
     }
 
-    void print_internal_without_quotes(const std::string &value, size_t indent = 0,
-                                       const std::string &line_terminator = "\n", size_t level = 0) {
+    void print_internal_without_quotes(const std::string& value, size_t indent = 0,
+                                       const std::string& line_terminator = "\n", size_t level = 0) {
         stream_ << std::string(indent, ' ') << value << line_terminator;
     }
 
-    void print_internal_without_quotes(const char *value, size_t indent = 0, const std::string &line_terminator = "\n",
+    void print_internal_without_quotes(const char* value, size_t indent = 0, const std::string& line_terminator = "\n",
                                        size_t level = 0) {
         stream_ << std::string(indent, ' ') << value << line_terminator;
     }
 
-    void print_internal_without_quotes(char value, size_t indent = 0, const std::string &line_terminator = "\n",
+    void print_internal_without_quotes(char value, size_t indent = 0, const std::string& line_terminator = "\n",
                                        size_t level = 0) {
         stream_ << std::string(indent, ' ') << value << line_terminator;
     }
 
-    void print_internal(bool value, size_t indent = 0, const std::string &line_terminator = "\n", size_t level = 0) {
+    void print_internal(bool value, size_t indent = 0, const std::string& line_terminator = "\n", size_t level = 0) {
         stream_ << std::string(indent, ' ') << (value ? "true" : "false") << line_terminator;
     }
 
     template <typename T>
     typename std::enable_if<std::is_pointer<T>::value == true, void>::type
-    print_internal(T value, size_t indent = 0, const std::string &line_terminator = "\n", size_t level = 0) {
+    print_internal(T value, size_t indent = 0, const std::string& line_terminator = "\n", size_t level = 0) {
         if (value == nullptr) {
             return print_internal(nullptr, indent, line_terminator, level);
         }
         stream_ << std::string(indent, ' ') << "<" << type(value) << " at " << value << ">" << line_terminator;
     }
 
-    std::string demangle(const char *name) {
+    std::string demangle(const char* name) {
 #ifdef __GNUG__
         int status = -4;
-        std::unique_ptr<char, void (*)(void *)> res{abi::__cxa_demangle(name, NULL, NULL, &status), std::free};
+        std::unique_ptr<char, void (*)(void*)> res{abi::__cxa_demangle(name, NULL, NULL, &status), std::free};
         return (status == 0) ? res.get() : name;
 #else
         return name;
@@ -588,13 +588,13 @@ class PrettyPrinter {
     }
 
     template <class T>
-    std::string type(const T &t) {
+    std::string type(const T& t) {
         return demangle(typeid(t).name());
     }
 
     template <typename T>
     typename std::enable_if<std::is_enum<T>::value == true, void>::type
-    print_internal(T value, size_t indent = 0, const std::string &line_terminator = "\n", size_t level = 0) {
+    print_internal(T value, size_t indent = 0, const std::string& line_terminator = "\n", size_t level = 0) {
         auto enum_string = magic_enum::enum_name(value);
         if (enum_string.has_value()) {
             stream_ << std::string(indent, ' ') << enum_string.value() << line_terminator;
@@ -621,7 +621,7 @@ class PrettyPrinter {
             is_specialization<T, std::unordered_map>::value == false &&
             is_specialization<T, std::unordered_multimap>::value == false,
         void>::type
-    print_internal(T value, size_t indent = 0, const std::string &line_terminator = "\n", size_t level = 0) {
+    print_internal(T value, size_t indent = 0, const std::string& line_terminator = "\n", size_t level = 0) {
         stream_ << std::string(indent, ' ') << value << line_terminator;
     }
 
@@ -643,20 +643,20 @@ class PrettyPrinter {
             is_specialization<T, std::unordered_map>::value == false &&
             is_specialization<T, std::unordered_multimap>::value == false,
         void>::type
-    print_internal(T value, size_t indent = 0, const std::string &line_terminator = "\n", size_t level = 0) {
+    print_internal(T value, size_t indent = 0, const std::string& line_terminator = "\n", size_t level = 0) {
         stream_ << std::string(indent, ' ') << "<Object " << type(value) << ">" << line_terminator;
     }
 
     template <typename T>
     typename std::enable_if<std::is_member_function_pointer<T>::value == true, void>::type
-    print_internal(T value, size_t indent = 0, const std::string &line_terminator = "\n", size_t level = 0) {
+    print_internal(T value, size_t indent = 0, const std::string& line_terminator = "\n", size_t level = 0) {
         stream_ << std::string(indent, ' ') << "<Object.method " << type(value) << " at " << &value << ">"
                 << line_terminator;
     }
 
     template <typename Container>
     typename std::enable_if<is_specialization<Container, std::vector>::value, void>::type
-    print_internal(const Container &value, size_t indent = 0, const std::string &line_terminator = "\n",
+    print_internal(const Container& value, size_t indent = 0, const std::string& line_terminator = "\n",
                    size_t level = 0) {
         typedef typename Container::value_type T;
         if (level == 0 && !compact_) {
@@ -721,7 +721,7 @@ class PrettyPrinter {
     }
 
     template <typename T, unsigned long int S>
-    void print_internal(const std::array<T, S> &value, size_t indent = 0, const std::string &line_terminator = "\n",
+    void print_internal(const std::array<T, S>& value, size_t indent = 0, const std::string& line_terminator = "\n",
                         size_t level = 0) {
         if (level == 0 && !compact_) {
             if (value.size() == 0) {
@@ -787,7 +787,7 @@ class PrettyPrinter {
     template <typename Container>
     typename std::enable_if<
         is_specialization<Container, std::list>::value || is_specialization<Container, std::deque>::value, void>::type
-    print_internal(const Container &value, size_t indent = 0, const std::string &line_terminator = "\n",
+    print_internal(const Container& value, size_t indent = 0, const std::string& line_terminator = "\n",
                    size_t level = 0) {
         typedef typename Container::value_type T;
         if (level == 0 && !compact_) {
@@ -863,7 +863,7 @@ class PrettyPrinter {
                                 is_specialization<Container, std::unordered_set>::value ||
                                 is_specialization<Container, std::unordered_multiset>::value,
                             void>::type
-    print_internal(const Container &value, size_t indent = 0, const std::string &line_terminator = "\n",
+    print_internal(const Container& value, size_t indent = 0, const std::string& line_terminator = "\n",
                    size_t level = 0) {
         typedef typename Container::value_type T;
         if (level == 0 && !compact_) {
@@ -941,21 +941,21 @@ class PrettyPrinter {
                                 is_specialization<T, std::unordered_map>::value == true ||
                                 is_specialization<T, std::unordered_multimap>::value == true,
                             void>::type
-    print_internal(const T &value, size_t indent = 0, const std::string &line_terminator = "\n", size_t level = 0) {
+    print_internal(const T& value, size_t indent = 0, const std::string& line_terminator = "\n", size_t level = 0) {
         typedef typename T::mapped_type Value;
         if (level == 0 && !compact_) {
             if (value.size() == 0) {
                 print_internal_without_quotes("{", 0, "");
             } else if (value.size() == 1) {
                 print_internal_without_quotes("{", 0, "");
-                for (auto &kvpair : value) {
+                for (auto& kvpair : value) {
                     print_internal(kvpair.first, 0, "", level + 1);
                     print_internal_without_quotes(" : ", 0, "");
                     print_internal(kvpair.second, 0, "", level + 1);
                 }
             } else if (value.size() > 0) {
                 size_t count = 0;
-                for (auto &kvpair : value) {
+                for (auto& kvpair : value) {
                     if (count == 0) {
                         print_internal_without_quotes("{", 0, "\n");
                         print_internal(kvpair.first, indent + indent_, "", level + 1);
@@ -998,14 +998,14 @@ class PrettyPrinter {
                 print_internal_without_quotes("{", indent, "");
             } else if (value.size() == 1) {
                 print_internal_without_quotes("{", indent, "");
-                for (auto &kvpair : value) {
+                for (auto& kvpair : value) {
                     print_internal(kvpair.first, 0, "", level + 1);
                     print_internal_without_quotes(" : ", 0, "");
                     print_internal(kvpair.second, 0, "", level + 1);
                 }
             } else if (value.size() > 0) {
                 size_t count = 0;
-                for (auto &kvpair : value) {
+                for (auto& kvpair : value) {
                     if (count == 0) {
                         print_internal_without_quotes("{", indent, "");
                         print_internal(kvpair.first, 0, "", level + 1);
@@ -1033,7 +1033,7 @@ class PrettyPrinter {
     }
 
     template <typename Key, typename Value>
-    void print_internal(std::pair<Key, Value> value, size_t indent = 0, const std::string &line_terminator = "\n",
+    void print_internal(std::pair<Key, Value> value, size_t indent = 0, const std::string& line_terminator = "\n",
                         size_t level = 0) {
         print_internal_without_quotes("(", indent, "");
         print_internal(value.first, 0, "");
@@ -1043,13 +1043,13 @@ class PrettyPrinter {
     }
 
     template <class... Ts>
-    void print_internal(std::variant<Ts...> value, size_t indent = 0, const std::string &line_terminator = "\n",
+    void print_internal(std::variant<Ts...> value, size_t indent = 0, const std::string& line_terminator = "\n",
                         size_t level = 0) {
-        std::visit([=](const auto &value) { print_internal(value, indent, line_terminator, level); }, value);
+        std::visit([=](const auto& value) { print_internal(value, indent, line_terminator, level); }, value);
     }
 
     template <typename T>
-    void print_internal(std::optional<T> value, size_t indent = 0, const std::string &line_terminator = "\n",
+    void print_internal(std::optional<T> value, size_t indent = 0, const std::string& line_terminator = "\n",
                         size_t level = 0) {
         if (value) {
             print_internal(value.value(), indent, line_terminator, level);
@@ -1060,7 +1060,7 @@ class PrettyPrinter {
 
     template <typename Container>
     typename std::enable_if<is_specialization<Container, std::queue>::value, void>::type
-    print_internal(const Container &value, size_t indent = 0, const std::string &line_terminator = "\n",
+    print_internal(const Container& value, size_t indent = 0, const std::string& line_terminator = "\n",
                    size_t level = 0) {
         auto current_compact = compact_;
         compact_ = true;
@@ -1077,7 +1077,7 @@ class PrettyPrinter {
 
     template <typename Container>
     typename std::enable_if<is_specialization<Container, std::priority_queue>::value, void>::type
-    print_internal(const Container &value, size_t indent = 0, const std::string &line_terminator = "\n",
+    print_internal(const Container& value, size_t indent = 0, const std::string& line_terminator = "\n",
                    size_t level = 0) {
         auto current_compact = compact_;
         compact_ = true;
@@ -1093,10 +1093,10 @@ class PrettyPrinter {
     }
 
     template <typename T>
-    void print_internal(std::initializer_list<T> value, size_t indent = 0, const std::string &line_terminator = "\n",
+    void print_internal(std::initializer_list<T> value, size_t indent = 0, const std::string& line_terminator = "\n",
                         size_t level = 0) {
         std::multiset<T> local;
-        for (const T &x : value) {
+        for (const T& x : value) {
             local.insert(x);
         }
         print_internal(local, indent, line_terminator_, level);
@@ -1104,7 +1104,7 @@ class PrettyPrinter {
 
     template <typename Container>
     typename std::enable_if<is_specialization<Container, std::stack>::value, void>::type
-    print_internal(const Container &value, size_t indent = 0, const std::string &line_terminator = "\n",
+    print_internal(const Container& value, size_t indent = 0, const std::string& line_terminator = "\n",
                    size_t level = 0) {
         bool current_compact = compact_;
         compact_ = false; // Need to print a stack like its a stack, i.e., vertical
@@ -1120,13 +1120,13 @@ class PrettyPrinter {
     }
 
     template <class... Args>
-    void print_internal(const std::tuple<Args...> &value, size_t indent = 0, const std::string &line_terminator = "\n",
+    void print_internal(const std::tuple<Args...>& value, size_t indent = 0, const std::string& line_terminator = "\n",
                         size_t level = 0) {
         stream_ << std::string(indent, ' ') << value << line_terminator;
     }
 
     template <typename T>
-    void print_internal(const std::complex<T> &value, size_t indent = 0, const std::string &line_terminator = "\n",
+    void print_internal(const std::complex<T>& value, size_t indent = 0, const std::string& line_terminator = "\n",
                         size_t level = 0) {
         stream_ << std::string(indent, ' ') << "(" << value.real() << " + " << value.imag() << "i)" << line_terminator;
     }
@@ -1136,7 +1136,7 @@ class PrettyPrinter {
                                 is_specialization<Pointer, std::shared_ptr>::value ||
                                 is_specialization<Pointer, std::weak_ptr>::value,
                             void>::type
-    print_internal(const Pointer &value, size_t indent = 0, const std::string &line_terminator = "\n",
+    print_internal(const Pointer& value, size_t indent = 0, const std::string& line_terminator = "\n",
                    size_t level = 0) {
         stream_ << std::string(indent, ' ') << "<" << type(value) << " at " << &value << ">" << line_terminator;
     }
