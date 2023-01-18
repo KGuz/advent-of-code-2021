@@ -142,7 +142,14 @@ struct pt3 {
         return os;
     }
 
-    bool operator<(const pt3& p) const { return x * x + y * y + z * z < p.x * p.x + p.y * p.y + p.z * p.z; }
+//    bool operator<(const pt3& p) const {
+//        if (x == p.x) {
+//
+//        } else {
+//            return x < p.x
+//        }
+//        return ;
+//    }
 };
 
 template <typename T>

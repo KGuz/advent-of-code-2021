@@ -75,6 +75,20 @@ auto map(const Iterable& iter, Predicate pred) {
     return res;
 }
 
+template <class Iterable, class Predicate>
+auto filter(const Iterable& iter, Predicate pred) {
+    using result_t = std::decay_t<decltype(iter[0])>;
+
+    vector<result_t> res;
+    res.reserve(iter.size());
+    for (const auto& elem : iter) {
+        if (pred(elem)) {
+            res.emplace_back(elem);
+        }
+    }
+    return res;
+}
+
 inline auto ltrim(string&& s) -> string {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
     return s;
@@ -135,6 +149,14 @@ auto max(const vector<T>& vec, Predicate pred) {
     return std::make_pair(max_val, vec[max_idx]);
 }
 
+template <typename T>
+auto sort(const T& first, const T& second) -> std::pair<T, T> {
+    if (first > second) {
+        return std::make_pair(second, first);
+    }
+    return std::make_pair(first, second);
+}
+
 template <class Iterable>
 auto contains(const Iterable& iter, const auto& val) -> bool {
     return std::any_of(iter.begin(), iter.end(), [&val](const auto& elem) { return elem == val; });
@@ -143,5 +165,11 @@ auto contains(const Iterable& iter, const auto& val) -> bool {
 template <class Iterable, class Predicate>
 auto reduce(const Iterable& iter, const auto& init, Predicate pred) {
     return std::accumulate(iter.begin(), iter.end(), init, pred);
+}
+
+template <std::ranges::range R>
+auto to_vector(R&& r) {
+    auto r_common = r | std::views::common;
+    return std::vector(r_common.begin(), r_common.end());
 }
 } // namespace utl
