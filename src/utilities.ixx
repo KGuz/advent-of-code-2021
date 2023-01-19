@@ -56,6 +56,11 @@ auto print(Args... args) {
 }
 
 template <typename... Args>
+auto print_inline(Args... args) {
+    pprint::PrettyPrinter().compact(true).print(args...);
+}
+
+template <typename... Args>
 auto print(std::ostream& os, Args... args) {
     pprint::PrettyPrinter(os).print(args...);
 }
