@@ -94,6 +94,20 @@ auto filter(const Iterable& iter, Predicate pred) {
     return res;
 }
 
+template <typename T>
+auto intersection(const std::set<T>& a, const std::set<T>& b) -> std::set<T> {
+    std::set<T> c;
+    std::set_intersection(a.begin(), a.end(), b.begin(), b.end(), std::inserter(c, c.end()));
+    return c;
+}
+
+template <typename T>
+auto difference(const std::set<T>& a, const std::set<T>& b) -> std::set<T> {
+    std::set<T> c;
+    std::set_difference(a.begin(), a.end(), b.begin(), b.end(), std::inserter(c, c.end()));
+    return c;
+}
+
 inline auto ltrim(string&& s) -> string {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
     return s;
@@ -130,6 +144,13 @@ auto split(const string& s, char c) -> vector<string> {
         }
     }
     return res;
+}
+
+template <typename T>
+auto concat(const vector<T>& a, const vector<T>& b) {
+    auto c = std::vector<T>{a.begin(), a.end()};
+    c.insert(c.end(), b.begin(), b.end());
+    return c;
 }
 
 template <typename T, class Predicate>
