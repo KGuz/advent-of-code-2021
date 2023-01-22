@@ -189,7 +189,7 @@ auto contains(const Iterable& iter, const auto& val) -> bool {
 }
 
 template <class Iterable, class Predicate>
-auto reduce(const Iterable& iter, const auto& init, Predicate pred) {
+auto reduce(const Iterable& iter, auto&& init, Predicate pred) {
     return std::accumulate(iter.begin(), iter.end(), init, pred);
 }
 
