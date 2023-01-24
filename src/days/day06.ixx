@@ -1,15 +1,16 @@
 module;
 #include "puzzle.hh"
 #include <array>
+#include <ranges>
 
 export module day06;
 import utilities;
 
-auto lanternfish(const std::string& input, size_t days) -> uint64_t {
-    auto fish = utl::map(utl::split(input, ','), utl::parse<uint64_t>);
+auto lanternfish(const string& input, size_t days) -> uint64_t {
+    auto fish = utl::split(input, ',') | views::transform(utl::parse<uint64_t>);
 
     auto groups = std::array<uint64_t, 9>();
-    for (auto& f : fish) {
+    for (auto&& f : fish) {
         groups[f] += 1;
     }
 
@@ -27,6 +28,6 @@ auto lanternfish(const std::string& input, size_t days) -> uint64_t {
 }
 
 export struct Day06 : Puzzle {
-    auto part_one(std::string input) -> std::string override { return std::to_string(lanternfish(input, 80)); }
-    auto part_two(std::string input) -> std::string override { return std::to_string(lanternfish(input, 256)); }
+    auto part_one(const std::string& input) -> string override { return std::to_string(lanternfish(input, 80)); }
+    auto part_two(const std::string& input) -> string override { return std::to_string(lanternfish(input, 256)); }
 };

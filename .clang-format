@@ -8,3 +8,5 @@ AllowShortIfStatementsOnASingleLine: true
 IndentCaseLabels: true
 AccessModifierOffset: -4
 PointerAlignment: Left
+AlignOperands: AlignAfterOperator
+AlignAfterOpenBracket: DontAlign

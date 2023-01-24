@@ -1,17 +1,18 @@
 module;
+#include "itertools.hh"
 #include "puzzle.hh"
 #include <iostream>
 #include <map>
 #include <ranges>
 #include <vector>
-export module day05;
 
+export module day05;
 import utilities;
+
 using pt = std::pair<int, int>;
 
-auto parse_vents(const std::string& input) -> std::vector<std::pair<pt, pt>> {
-    auto lines = utl::lines(input);
-    return utl::map(lines, [](const auto& s) {
+auto parse_vents(const string& input) -> vector<std::pair<pt, pt>> {
+    auto vents = utl::lines(input) | views::transform([](const auto& s) {
         auto tokens = utl::split(s, ' ');
         auto [x1, y1] = utl::split_once(tokens[0], ',');
         auto [x2, y2] = utl::split_once(tokens[2], ',');
@@ -20,6 +21,7 @@ auto parse_vents(const std::string& input) -> std::vector<std::pair<pt, pt>> {
         auto pt2 = pt{utl::parse<int>(x2), utl::parse<int>(y2)};
         return std::make_pair(pt1, pt2);
     });
+    return vents | ranges::to<vector>();
 }
 
 [[maybe_unused]] auto visualize(const std::map<pt, int>& map) {
@@ -40,19 +42,21 @@ auto parse_vents(const std::string& input) -> std::vector<std::pair<pt, pt>> {
     }
 }
 
-auto hydrothermal_venture(std::vector<std::pair<pt, pt>>&& points) -> int {
+auto hydrothermal_venture(vector<std::pair<pt, pt>>&& points) -> int {
     auto map = std::map<pt, int>();
     for (const auto& [p1, p2] : points) {
         if (p1.first == p2.first) {
-            auto [y1, y2] = utl::sort(p1.second, p2.second);
+            auto y1 = p1.second, y2 = p2.second;
+            auto inc_y = y1 < y2 ? 1 : -1;
 
-            for (auto y = y1; y <= y2; ++y) {
+            for (auto y = y1; y != y2; y += inc_y) {
                 map[pt{p1.first, y}] += 1;
             }
         } else if (p1.second == p2.second) {
-            auto [x1, x2] = utl::sort(p1.first, p2.first);
+            auto x1 = p1.first, x2 = p2.first;
+            auto inc_x = x1 < x2 ? 1 : -1;
 
-            for (auto x = x1; x <= x2; ++x) {
+            for (auto x = x1; x != x2; x += inc_x) {
                 map[pt{x, p1.second}] += 1;
             }
         } else {
@@ -67,20 +71,19 @@ auto hydrothermal_venture(std::vector<std::pair<pt, pt>>&& points) -> int {
         }
     }
 
-    return utl::reduce(map, 0, [](const auto acc, const auto& pair) {
-        return acc + static_cast<int>(pair.second >= 2);
-    });
+    return utl::reduce(
+        map, 0, [](const auto acc, const auto& pair) { return acc + static_cast<int>(pair.second >= 2); });
 }
 
 export struct Day05 : Puzzle {
-    auto part_one(std::string input) -> std::string override {
-        auto points = utl::filter(parse_vents(input), [](const auto& coords) {
+    auto part_one(const std::string& input) -> string override {
+        auto points = parse_vents(input) | views::filter([](const auto& coords) {
             const auto& [p1, p2] = coords;
             return p1.first == p2.first || p1.second == p2.second;
-        });
+        }) | ranges::to<vector>();
         return std::to_string(hydrothermal_venture(std::move(points)));
     }
-    auto part_two(std::string input) -> std::string override {
+    auto part_two(const std::string& input) -> string override {
         return std::to_string(hydrothermal_venture(std::move(parse_vents(input))));
     }
 };

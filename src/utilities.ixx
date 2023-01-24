@@ -1,68 +1,90 @@
 module;
+#include "itertools.hh"
 #include "pprint.hh"
 #include <algorithm>
+#include <coroutine>
+#include <exception>
 #include <iostream>
-#include <limits>
 #include <numeric>
-#include <span>
 #include <string>
 #include <vector>
+
 export module utilities;
+export using std::string, std::vector;
+export namespace ranges = std::ranges;
+export namespace views = std::views;
 
-using std::string, std::vector;
-
-template <typename Iterable>
-class Enumerator {
-private:
-    Iterable _iter;
-    size_t _size;
-    decltype(std::begin(_iter)) _begin;
-    const decltype(std::end(_iter)) _end;
-
-public:
-    Enumerator(Iterable iter) : _iter(iter), _size(0), _begin(std::begin(iter)), _end(std::end(iter)) {}
-    const Enumerator& begin() const { return *this; }
-    const Enumerator& end() const { return *this; }
-    bool operator!=(const Enumerator&) const { return _begin != _end; }
-    void operator++() { ++_begin, ++_size; }
-    auto operator*() const -> std::pair<size_t, decltype(*_begin)> { return {_size, *_begin}; }
-};
-
-struct Slice {
-    size_t begin, end;
-
-    template <std::ranges::viewable_range ViewableRange>
-    friend auto operator|(ViewableRange& vr, const Slice& s) {
-        return std::span{vr.begin() + s.begin, s.end - s.begin};
+namespace iter {
+template <typename C, typename V>
+auto append(C& container, V&& value) {
+    if constexpr (requires(C & c, V && v) { c.push_back(std::forward<V>(v)); }) {
+        return container.push_back(std::forward<V>(value));
+    } else {
+        return container.insert(container.end(), std::forward<V>(value));
     }
-};
+}
+
+export template <template <typename> typename C, typename I>
+auto collect(I&& iterator) {
+    using value_t = std::decay_t<decltype(*iterator.begin())>;
+
+    C<value_t> container;
+    if constexpr (requires(I && iter) { iter.size(); }) container.reserve(iterator.size());
+
+    for (auto&& value : iterator) {
+        append(container, std::forward<value_t>(value));
+    }
+    return container;
+}
+
+export template <typename I>
+auto collect_vec(I&& iterator) {
+    return collect<vector>(iterator);
+}
+} // namespace iter
 
 export namespace utl {
-template <typename Iterable>
-auto enumerate(Iterable&& iter) -> Enumerator<Iterable> {
-    return {std::forward<Iterable>(iter)};
+/* --------------------------------- print utilities --------------------------------- */
+
+inline auto print(std::ostream& os, const auto&... args) { pprint::PrettyPrinter(os).print(args...); }
+
+inline auto print(const auto&... args) { utl::print(std::cout, args...); }
+
+inline auto print_inline(std::ostream& os, const auto&... args) {
+    pprint::PrettyPrinter(os).compact(true).print(args...);
 }
 
-auto slice(size_t b, size_t e) { return Slice{b, e}; }
+inline auto print_inline(const auto&... args) { utl::print_inline(std::cout, args...); }
 
-template <std::ranges::viewable_range ViewableRange>
-auto slice(ViewableRange& vr, size_t b, size_t e) {
-    return vr | slice(b, e);
+/* --------------------------------- string utilities -------------------------------- */
+
+inline auto ltrim(string&& s) -> string {
+    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
+    return s;
 }
 
-template <typename... Args>
-auto print(Args... args) {
-    pprint::PrettyPrinter().print(args...);
+inline auto rtrim(string&& s) -> string {
+    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), s.end());
+    return s;
 }
 
-template <typename... Args>
-auto print_inline(Args... args) {
-    pprint::PrettyPrinter().compact(true).print(args...);
+inline auto trim(string&& s) -> string { return rtrim(ltrim(std::move(s))); }
+
+auto split_once(const string& s, char c) -> std::pair<string, string> {
+    auto delim = s.begin() + static_cast<int>(s.find(c));
+    return {string(s.begin(), delim), string(delim + 1, s.end())};
 }
 
-template <typename... Args>
-auto print(std::ostream& os, Args... args) {
-    pprint::PrettyPrinter(os).print(args...);
+auto split(const string& s, char c) -> vector<string> {
+    auto res = vector<string>{};
+    auto ss = std::stringstream(s);
+
+    for (string line; std::getline(ss, line, c);) {
+        if (not line.empty()) {
+            res.push_back(line);
+        }
+    }
+    return res;
 }
 
 template <typename T>
@@ -70,29 +92,17 @@ inline auto parse(const string& str) -> T {
     return static_cast<T>(std::stof(str));
 }
 
-template <class Iterable, class Predicate>
-auto map(const Iterable& iter, Predicate pred) {
-    using result_t = std::decay_t<decltype(pred(iter[0]))>;
+auto lines(const string& s) -> vector<string> {
+    auto lines = vector<string>{};
+    auto ss = std::stringstream(s);
 
-    vector<result_t> res;
-    res.reserve(iter.size());
-    std::transform(iter.begin(), iter.end(), std::back_inserter(res), pred);
-    return res;
-}
-
-template <class Iterable, class Predicate>
-auto filter(const Iterable& iter, Predicate pred) {
-    using result_t = std::decay_t<decltype(iter[0])>;
-
-    vector<result_t> res;
-    res.reserve(iter.size());
-    for (const auto& elem : iter) {
-        if (pred(elem)) {
-            res.emplace_back(elem);
-        }
+    for (string line; std::getline(ss, line);) {
+        lines.push_back(rtrim(std::move(line)));
     }
-    return res;
+    return lines;
 }
+
+/* ------------------------------- algorithm utilities ------------------------------- */
 
 template <typename T>
 auto intersection(const std::set<T>& a, const std::set<T>& b) -> std::set<T> {
@@ -108,55 +118,27 @@ auto difference(const std::set<T>& a, const std::set<T>& b) -> std::set<T> {
     return c;
 }
 
-inline auto ltrim(string&& s) -> string {
-    s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
-    return s;
-}
-
-inline auto rtrim(string&& s) -> string {
-    s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) { return !std::isspace(ch); }).base(), s.end());
-    return s;
-}
-
-inline auto trim(string&& s) -> string { return rtrim(ltrim(std::move(s))); }
-
-auto lines(const string& s) -> vector<string> {
-    auto lines = vector<string>{};
-    auto ss = std::stringstream(s);
-
-    for (string line; std::getline(ss, line);) {
-        lines.push_back(rtrim(std::move(line)));
-    }
-    return lines;
-}
-
-auto split_once(const string& s, char c) -> std::pair<string, string> {
-    auto delim = s.begin() + static_cast<int>(s.find(c));
-    return {string(s.begin(), delim), string(delim + 1, s.end())};
-}
-auto split(const string& s, char c) -> vector<string> {
-    auto res = vector<string>{};
-    auto ss = std::stringstream(s);
-
-    for (string line; std::getline(ss, line, c);) {
-        if (not line.empty()) {
-            res.push_back(line);
-        }
-    }
-    return res;
-}
-
 template <typename T>
 auto concat(const vector<T>& a, const vector<T>& b) {
-    auto c = std::vector<T>{a.begin(), a.end()};
+    auto c = vector<T>{a.begin(), a.end()};
     c.insert(c.end(), b.begin(), b.end());
     return c;
+}
+
+template <class Iterable, class Predicate>
+auto reduce(const Iterable& iter, auto&& init, Predicate pred) {
+    return std::accumulate(iter.begin(), iter.end(), init, pred);
+}
+
+template <class Iterable>
+auto contains(const Iterable& iter, const auto& val) -> bool {
+    return std::any_of(iter.begin(), iter.end(), [&val](const auto& elem) { return elem == val; });
 }
 
 template <typename T, class Predicate>
 auto min(const vector<T>& vec, Predicate pred) {
     auto min_val = INT_MAX, min_idx = 0;
-    for (const auto& [idx, elem] : enumerate(vec)) {
+    for (const auto& [idx, elem] : iter::enumerate(vec)) {
         if (auto val = pred(elem); val < min_val) {
             min_val = val, min_idx = idx;
         }
@@ -167,7 +149,7 @@ auto min(const vector<T>& vec, Predicate pred) {
 template <typename T, class Predicate>
 auto max(const vector<T>& vec, Predicate pred) {
     auto max_val = INT_MIN, max_idx = static_cast<int>(vec.size() - 1);
-    for (const auto& [idx, elem] : enumerate(vec)) {
+    for (const auto& [idx, elem] : iter::enumerate(vec)) {
         if (auto val = pred(elem); val > max_val) {
             max_val = val, max_idx = idx;
         }
@@ -175,27 +157,57 @@ auto max(const vector<T>& vec, Predicate pred) {
     return std::make_pair(max_val, vec[max_idx]);
 }
 
+inline auto to_vector(ranges::range auto&& range) -> std::vector<std::ranges::range_value_t<decltype(range)>> {
+    return ranges::to<vector>(range);
+}
+
+/* --------------------------------- generator impl ---------------------------------- */
+
 template <typename T>
-auto sort(const T& first, const T& second) -> std::pair<T, T> {
-    if (first > second) {
-        return std::make_pair(second, first);
+struct generator {
+    struct promise_type;
+    using handle_type = std::coroutine_handle<promise_type>;
+
+    struct promise_type {
+        T value_;
+        std::exception_ptr exception_;
+
+        generator get_return_object() { return generator(handle_type::from_promise(*this)); }
+        std::suspend_always initial_suspend() { return {}; }
+        std::suspend_always final_suspend() noexcept { return {}; }
+        void unhandled_exception() { exception_ = std::current_exception(); }
+
+        template <std::convertible_to<T> From>
+        std::suspend_always yield_value(From&& from) {
+            value_ = std::forward<From>(from);
+            return {};
+        }
+        void return_void() {}
+    };
+
+    handle_type h_;
+
+    generator(handle_type h) : h_(h) {}
+    ~generator() { h_.destroy(); }
+    explicit operator bool() {
+        fill();
+        return !h_.done();
     }
-    return std::make_pair(first, second);
-}
+    T operator()() {
+        fill();
+        full_ = false;
+        return std::move(h_.promise().value_);
+    }
 
-template <class Iterable>
-auto contains(const Iterable& iter, const auto& val) -> bool {
-    return std::any_of(iter.begin(), iter.end(), [&val](const auto& elem) { return elem == val; });
-}
+private:
+    bool full_ = false;
 
-template <class Iterable, class Predicate>
-auto reduce(const Iterable& iter, auto&& init, Predicate pred) {
-    return std::accumulate(iter.begin(), iter.end(), init, pred);
-}
-
-template <std::ranges::range R>
-auto to_vector(R&& r) {
-    auto r_common = r | std::views::common;
-    return std::vector(r_common.begin(), r_common.end());
-}
+    void fill() {
+        if (!full_) {
+            h_();
+            if (h_.promise().exception_) std::rethrow_exception(h_.promise().exception_);
+            full_ = true;
+        }
+    }
+};
 } // namespace utl

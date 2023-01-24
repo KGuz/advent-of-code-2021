@@ -1,39 +1,33 @@
 module;
 #include "puzzle.hh"
+#include <ranges>
 
 export module day02;
 import utilities;
 
-using std::string;
-
 enum Dir { Forward, Down, Up };
 auto to_dir(const string& text) -> Dir {
-    if (text.compare("down") == 0) {
-        return Dir::Down;
-    } else if (text.compare("up") == 0) {
-        return Dir::Up;
-    } else {
-        return Dir::Forward;
-    }
+    if (text == "down") return Dir::Down;
+    if (text == "up") return Dir::Up;
+    return Dir::Forward;
 }
 
-template <typename Pred>
-auto calculate(const string& input, Pred predicate) -> string {
-    auto lines = utl::lines(input);
-    auto commands = utl::map(lines, [](const auto& line) {
+template <typename Interpretation>
+auto calculate(const string& input, Interpretation fn) -> string {
+    auto commands = utl::lines(input) | views::transform([](const auto& line) {
         auto [direction, units] = utl::split_once(line, ' ');
         return std::make_pair(to_dir(direction), utl::parse<int>(units));
     });
 
     auto pos = std::make_tuple(0, 0, 0);
     for (const auto& [dir, units] : commands) {
-        predicate(dir, units, pos);
+        fn(dir, units, pos);
     }
     return std::to_string(get<0>(pos) * get<1>(pos));
 }
 
 export struct Day02 : Puzzle {
-    auto part_one(string input) -> string {
+    auto part_one(const std::string& input) -> string {
         auto interpretation = [](auto& dir, auto& units, auto& pos) {
             switch (dir) {
                 case Dir::Forward: std::get<0>(pos) += units; break;
@@ -44,7 +38,7 @@ export struct Day02 : Puzzle {
         return calculate(input, interpretation);
     }
 
-    auto part_two(string input) -> string {
+    auto part_two(const std::string& input) -> string {
         auto interpretation = [](auto& dir, auto& units, auto& pos) {
             switch (dir) {
                 case Dir::Forward:

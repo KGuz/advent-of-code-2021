@@ -6,10 +6,11 @@ module;
 #include <ranges>
 #include <set>
 #include <vector>
+
 export module day08;
 import utilities;
 
-auto decode(const std::string& token) -> std::optional<int> {
+auto decode(const string& token) -> std::optional<int> {
     switch (token.size()) {
         case 2: return 1;
         case 4: return 4;
@@ -19,7 +20,7 @@ auto decode(const std::string& token) -> std::optional<int> {
     }
 }
 
-auto decode(const std::string& token, std::map<int, std::set<char>>& map) -> int {
+auto decode(const string& token, std::map<int, std::set<char>>& map) -> int {
     auto set = std::set<char>{token.begin(), token.end()};
     switch (token.size()) {
         case 2: return 1;
@@ -38,7 +39,7 @@ auto decode(const std::string& token, std::map<int, std::set<char>>& map) -> int
 }
 
 export struct Day08 : Puzzle {
-    auto part_one(std::string input) -> std::string override {
+    auto part_one(const std::string& input) -> string override {
         auto unique_count = 0;
         for (auto& line : utl::lines(input)) {
             auto [_, right] = utl::split_once(line, '|');
@@ -48,7 +49,7 @@ export struct Day08 : Puzzle {
         return std::to_string(unique_count);
     }
 
-    auto part_two(std::string input) -> std::string override {
+    auto part_two(const std::string& input) -> string override {
         auto output_sum = 0;
         for (auto& line : utl::lines(input)) {
             auto [left, right] = utl::split_once(line, '|');

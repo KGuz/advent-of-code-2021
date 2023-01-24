@@ -5,6 +5,7 @@ module;
 #include <ranges>
 #include <utility>
 #include <vector>
+
 export module day10;
 import utilities;
 
@@ -40,9 +41,9 @@ auto incomplete_penalty(char bracket) -> int {
     }
 }
 
-auto syntax_errors(const std::string& line) -> std::pair<std::vector<char>, std::vector<char>> {
-    auto errors = std::vector<char>();
-    auto stack = std::vector<char>();
+auto syntax_errors(const string& line) -> std::pair<vector<char>, vector<char>> {
+    auto errors = vector<char>();
+    auto stack = vector<char>();
     for (auto& c : line) {
         if (is_open(c)) {
             stack.emplace_back(c);
@@ -55,7 +56,7 @@ auto syntax_errors(const std::string& line) -> std::pair<std::vector<char>, std:
 }
 
 export struct Day10 : Puzzle {
-    auto part_one(std::string input) -> std::string override {
+    auto part_one(const std::string& input) -> string override {
         auto score = 0;
         for (auto& line : utl::lines(input)) {
             for (auto& error : syntax_errors(line).first) {
@@ -65,8 +66,8 @@ export struct Day10 : Puzzle {
         return std::to_string(score);
     }
 
-    auto part_two(std::string input) -> std::string override {
-        auto scores = std::vector<uint64_t>();
+    auto part_two(const std::string& input) -> string override {
+        auto scores = vector<uint64_t>();
         for (auto& line : utl::lines(input)) {
             auto [errors, stack] = syntax_errors(line);
             if (errors.empty()) {
@@ -77,7 +78,7 @@ export struct Day10 : Puzzle {
                 scores.emplace_back(score);
             }
         }
-        std::ranges::sort(scores);
+        ranges::sort(scores);
         return std::to_string(scores[scores.size() / 2]);
     }
 };
