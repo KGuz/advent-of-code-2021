@@ -24,10 +24,10 @@ auto lanternfish(const string& input, size_t days) -> uint64_t {
         groups = next;
     }
 
-    return utl::reduce(groups, 0ull, [](auto acc, const auto& size) { return acc + size; });
+    return utl::reduce(groups, 0ull, [](auto acc, auto&& size) { return acc + size; });
 }
 
 export struct Day06 : Puzzle {
-    auto part_one(const std::string& input) -> string override { return std::to_string(lanternfish(input, 80)); }
-    auto part_two(const std::string& input) -> string override { return std::to_string(lanternfish(input, 256)); }
+    auto part_one(const string& input) -> string override { return to_string(lanternfish(input, 80)); }
+    auto part_two(const string& input) -> string override { return to_string(lanternfish(input, 256)); }
 };

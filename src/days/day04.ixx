@@ -77,10 +77,10 @@ auto giant_squid(const string& input, Strategy strategy) -> string {
     auto nums = utl::split(lines[0], ',') | views::transform(utl::parse<int>) | ranges::to<vector>();
     auto bingo_cards = Bingo::generate(lines);
 
-    auto fun = [&nums](const auto& b) { return b.simulate(nums); };
+    auto fun = [&](const auto& b) { return b.simulate(nums); };
     auto [steps, bingo] = (strategy == Strategy::Win ? utl::min(bingo_cards, fun) : utl::max(bingo_cards, fun));
 
-    auto acc = utl::reduce(bingo.numbers(), 0, [&nums, &steps](int acc, int key) {
+    auto acc = utl::reduce(bingo.numbers(), 0, [&](int acc, int key) {
         return acc + (utl::contains(nums | iter::slice(0, steps + 1), key) ? 0 : key);
     });
 

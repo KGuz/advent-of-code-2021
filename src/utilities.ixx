@@ -45,7 +45,6 @@ auto collect_vec(I&& iterator) {
 
 export namespace utl {
 /* --------------------------------- print utilities --------------------------------- */
-
 inline auto print(std::ostream& os, const auto&... args) { pprint::PrettyPrinter(os).print(args...); }
 
 inline auto print(const auto&... args) { utl::print(std::cout, args...); }
@@ -57,7 +56,6 @@ inline auto print_inline(std::ostream& os, const auto&... args) {
 inline auto print_inline(const auto&... args) { utl::print_inline(std::cout, args...); }
 
 /* --------------------------------- string utilities -------------------------------- */
-
 inline auto ltrim(string&& s) -> string {
     s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) { return !std::isspace(ch); }));
     return s;
@@ -103,7 +101,6 @@ auto lines(const string& s) -> vector<string> {
 }
 
 /* ------------------------------- algorithm utilities ------------------------------- */
-
 template <typename T>
 auto intersection(const std::set<T>& a, const std::set<T>& b) -> std::set<T> {
     std::set<T> c;
@@ -157,7 +154,7 @@ auto max(const vector<T>& vec, Predicate pred) {
     return std::make_pair(max_val, vec[max_idx]);
 }
 
-inline auto to_vector(ranges::range auto&& range) -> std::vector<std::ranges::range_value_t<decltype(range)>> {
+inline auto to_vector(ranges::range auto&& range) {
     return ranges::to<vector>(range);
 }
 
