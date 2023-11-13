@@ -3,12 +3,12 @@
 
 import advent;
 import args;
-import dataset;
+import assets;
 import utilities;
 
 auto main(int argc, char** argv) -> int {
     auto [day, example] = args::parse(argc, argv);
-    auto input = dataset::input(day, example);
+    auto input = assets::input(day, example);
     auto puzzle = advent::puzzle(day);
 
     utl::print(std::format("{:*^60}", std::format(" Advent of Code 2021 - Day {} ", day)));
