@@ -1045,7 +1045,7 @@ private:
     template <class... Ts>
     void print_internal(std::variant<Ts...> value, size_t indent = 0, const std::string& line_terminator = "\n",
                         size_t level = 0) {
-        std::visit([=](const auto& value) { print_internal(value, indent, line_terminator, level); }, value);
+        std::visit([=, this](const auto& value) { print_internal(value, indent, line_terminator, level); }, value);
     }
 
     template <typename T>
