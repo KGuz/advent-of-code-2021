@@ -1,51 +1,52 @@
 cmake_minimum_required(VERSION 3.24)
-project(AoC21)
+project(aoc)
 
 set(CMAKE_CXX_STANDARD 23)
 
-add_library(Utl
-        src/utilities.ixx
+add_library(utl
+        src/utilities/utl.hh
+        src/utilities/utl.cc
         )
-target_include_directories(Utl PUBLIC libs)
-target_link_directories(Utl PUBLIC libs)
+target_include_directories(utl PUBLIC libs)
+target_link_directories(utl PUBLIC libs)
 
-add_library(Days
-        src/advent/day01.ixx
-        src/advent/day02.ixx
-        src/advent/day03.ixx
-        src/advent/day04.ixx
-        src/advent/day05.ixx
-        src/advent/day06.ixx
-        src/advent/day07.ixx
-        src/advent/day08.ixx
-        src/advent/day09.ixx
-        src/advent/day10.ixx
-        src/advent/day11.ixx
-        src/advent/day12.ixx
-        src/advent/day13.ixx
-        src/advent/day14.ixx
-        src/advent/day15.ixx
-        src/advent/day16.ixx
-        src/advent/day17.ixx
-        src/advent/day18.ixx
-        src/advent/day19.ixx
-        src/advent/day20.ixx
-        src/advent/day21.ixx
-        src/advent/day22.ixx
-        src/advent/day23.ixx
-        src/advent/day24.ixx
-        src/advent/day25.ixx
+add_library(advent
+        src/advent/advent.hh
+        src/advent/day01.cc
+        src/advent/day02.cc
+        src/advent/day03.cc
+        src/advent/day04.cc
+        src/advent/day05.cc
+        src/advent/day06.cc
+        src/advent/day07.cc
+        src/advent/day08.cc
+        src/advent/day09.cc
+        src/advent/day10.cc
+        src/advent/day11.cc
+        src/advent/day12.cc
+        src/advent/day13.cc
+        src/advent/day14.cc
+        src/advent/day15.cc
+        src/advent/day16.cc
+        src/advent/day17.cc
+        src/advent/day18.cc
+        src/advent/day19.cc
+        src/advent/day20.cc
+        src/advent/day21.cc
+        src/advent/day22.cc
+        src/advent/day23.cc
+        src/advent/day24.cc
+        src/advent/day25.cc
         )
-target_include_directories(Days PUBLIC src)
-target_link_directories(Days PUBLIC src)
-target_link_libraries(Days PUBLIC Utl)
+target_link_libraries(advent PUBLIC utl)
+target_include_directories(advent PUBLIC src/utilities)
+target_link_directories(advent PUBLIC src/utilities)
 
-add_executable(AoC21
-        src/advent.ixx
-        src/args.ixx
-        src/assets.ixx
-        src/main.cc
+add_executable(aoc 
+        src/aoc/args.hh
+        src/aoc/assets.hh
+        src/aoc/main.cc
         )
-target_include_directories(AoC21 PUBLIC libs src src/advent)
-target_link_directories(AoC21 PUBLIC libs src src/advent)
-target_link_libraries(AoC21 PUBLIC Utl Days)
+target_link_libraries(aoc PUBLIC advent)
+target_include_directories(aoc PUBLIC libs src/aoc src/advent)
+target_link_directories(aoc PUBLIC libs src/aoc src/advent)
