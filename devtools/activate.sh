@@ -3,7 +3,7 @@ function install_clang {
     wget https://apt.llvm.org/llvm.sh;
     chmod +x llvm.sh;
 
-    sudo ./llvm.sh 17;
+    sudo ./llvm.sh 17 all;
 
     sudo update-alternatives --install /usr/bin/clang clang /usr/bin/clang-17 100;
     sudo update-alternatives --install /usr/bin/clang++ clang++ /usr/bin/clang++-17 100;
@@ -20,9 +20,7 @@ function set_clang {
 }
 
 function install_gcc {
-    sudo apt update;
     sudo apt install software-properties-common -y;
-
     sudo add-apt-repository ppa:ubuntu-toolchain-r/test -y;
     sudo apt update;
 
@@ -41,7 +39,7 @@ function set_gcc {
 }
 
 function install_gtest {
-    sudo apt-get install libgtest-dev;
+    sudo apt-get install libgtest-dev -y;
 
     cd /usr/src/gtest;
 
@@ -50,9 +48,9 @@ function install_gtest {
 
     sudo cp ./lib/libgtest*.a /usr/lib;
 
-    sudo mkdir /usr/local/lib/gtest;
-    sudo ln -s /usr/lib/libgtest.a /usr/local/lib/gtest/libgtest.a;
-    sudo ln -s /usr/lib/libgtest_main.a /usr/local/lib/gtest/libgtest_main.a;
+    sudo mkdir -p /usr/local/lib/gtest;
+    sudo ln -sfn /usr/lib/libgtest.a /usr/local/lib/gtest/libgtest.a;
+    sudo ln -sfn /usr/lib/libgtest_main.a /usr/local/lib/gtest/libgtest_main.a;
 
     cd -;
 }
@@ -61,9 +59,10 @@ function install_cmake {
     wget https://github.com/Kitware/CMake/releases/download/v3.27.7/cmake-3.27.7-linux-x86_64.sh
     chmod +x cmake-3.27.7-linux-x86_64.sh;
 
+    sudo mkdir -p /opt/cmake-3.27.7-linux-x86_64;
     sudo ./cmake-3.27.7-linux-x86_64.sh --skip-license --prefix=/opt/cmake-3.27.7-linux-x86_64/;
-    sudo ln -s /opt/cmake-3.27.7-linux-x86_64/bin/* /usr/local/bin;
-    
+    sudo ln -sfn /opt/cmake-3.27.7-linux-x86_64/bin/* /usr/local/bin;
+
     rm cmake-3.27.7-linux-x86_64.sh;
 }
 
@@ -72,11 +71,13 @@ function install_clang_format {
 }
 
 function prepare {
+    sudo apt-get update && sudo apt-get install build-essential -y;
     install_cmake;    
     install_gtest;
-    install_clang;
+    install_gcc;
     install_clang_format;
-    set_clang;
+    install_clang;
+    set_gcc;
 }
 
 function build {
