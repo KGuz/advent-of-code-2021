@@ -1,21 +1,17 @@
 #pragma once
-#include <cassert>
+#include <format>
 #include <fstream>
 #include <string>
 
 namespace assets {
 inline auto load_input(int day) -> std::string {
-    auto zero = (day < 10 ? "0" : "");
-    auto path = std::format("assets/inputs/day{}{}.txt", zero, day);
-
+    auto path = std::format("assets/inputs/day{:02}.txt", day);
     auto f = std::ifstream(path);
     return std::string((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
 }
 
 inline auto load_example(int day) -> std::string {
-    auto zero = (day < 10 ? "0" : "");
-    auto path = std::format("assets/examples/day{}{}.txt", zero, day);
-
+    auto path = std::format("assets/examples/day{:02}.txt", day);
     auto f = std::ifstream(path);
     return std::string((std::istreambuf_iterator<char>(f)), std::istreambuf_iterator<char>());
 }

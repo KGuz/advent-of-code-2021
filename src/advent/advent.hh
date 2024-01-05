@@ -2,7 +2,6 @@
 #include <cstdlib>
 #include <memory>
 #include <string>
-#include <string_view>
 
 namespace advent {
 struct Puzzle {

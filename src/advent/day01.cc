@@ -12,6 +12,7 @@ auto sonar_sweep(const std::string& input, int windows_size) -> std::string {
 auto advent::Day01::part_one(const std::string& input) -> std::string {
     return sonar_sweep(input, 2);
 }
+
 auto advent::Day01::part_two(const std::string& input) -> std::string {
     return sonar_sweep(input, 4);
 }

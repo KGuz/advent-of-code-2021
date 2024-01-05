@@ -26,64 +26,64 @@ SOFTWARE.
 #include <iostream>
 
 template <typename T>
-struct pt2d {
+struct P2 {
     T x{}, y{};
 
-    pt2d(T x, T y) : x(x), y(y) {}
-    pt2d(const pt2d& p) = default;
-    pt2d(pt2d&& p) noexcept = default;
+    P2(T x, T y) : x(x), y(y) {}
+    P2(const P2& p) = default;
+    P2(P2&& p) noexcept = default;
 
-    auto operator=(const pt2d& p) -> pt2d& {
+    auto operator=(const P2& p) -> P2& {
         x = p.x, y = p.y;
         return *this;
     }
-    auto operator<=>(const pt2d& p) const = default;
+    auto operator<=>(const P2& p) const = default;
 
-    auto operator+(const pt2d& p) const -> pt2d { return pt2d(x + p.x, y + p.y); }
-    auto operator-(const pt2d& p) const -> pt2d { return pt2d(x - p.x, y - p.y); }
-    auto operator*(const pt2d& p) const -> pt2d { return pt2d(x * p.x, y * p.y); }
-    auto operator/(const pt2d& p) const -> pt2d { return pt2d(x / p.x, y / p.y); }
+    auto operator+(const P2& p) const -> P2 { return P2(x + p.x, y + p.y); }
+    auto operator-(const P2& p) const -> P2 { return P2(x - p.x, y - p.y); }
+    auto operator*(const P2& p) const -> P2 { return P2(x * p.x, y * p.y); }
+    auto operator/(const P2& p) const -> P2 { return P2(x / p.x, y / p.y); }
 
-    auto operator+=(pt2d& p) -> pt2d& {
+    auto operator+=(P2& p) -> P2& {
         x += p.x, y += p.y;
         return *this;
     }
-    auto operator-=(pt2d& p) -> pt2d& {
+    auto operator-=(P2& p) -> P2& {
         x -= p.x, y -= p.y;
         return *this;
     }
-    auto operator*=(pt2d& p) -> pt2d& {
+    auto operator*=(P2& p) -> P2& {
         x *= p.x, y *= p.y;
         return *this;
     }
-    auto operator/=(pt2d& p) -> pt2d& {
+    auto operator/=(P2& p) -> P2& {
         x /= p.x, y /= p.y;
         return *this;
     }
 
-    auto operator+(T s) const -> pt2d { return pt2d(x + s, y + s); }
-    auto operator-(T s) const -> pt2d { return pt2d(x - s, y - s); }
-    auto operator*(T s) const -> pt2d { return pt2d(x * s, y * s); }
-    auto operator/(T s) const -> pt2d { return pt2d(x / s, y / s); }
+    auto operator+(T s) const -> P2 { return P2(x + s, y + s); }
+    auto operator-(T s) const -> P2 { return P2(x - s, y - s); }
+    auto operator*(T s) const -> P2 { return P2(x * s, y * s); }
+    auto operator/(T s) const -> P2 { return P2(x / s, y / s); }
 
-    auto operator+=(T s) -> pt2d& {
+    auto operator+=(T s) -> P2& {
         x += s, y += s;
         return *this;
     }
-    auto operator-=(T s) -> pt2d& {
+    auto operator-=(T s) -> P2& {
         x -= s, y -= s;
         return *this;
     }
-    auto operator*=(T s) -> pt2d& {
+    auto operator*=(T s) -> P2& {
         x *= s, y *= s;
         return *this;
     }
-    auto operator/=(T s) -> pt2d& {
+    auto operator/=(T s) -> P2& {
         x /= s, y /= s;
         return *this;
     }
 
-    friend auto operator<<(std::ostream& os, const pt2d& p) -> std::ostream& {
+    friend auto operator<<(std::ostream& os, const P2& p) -> std::ostream& {
         os << "(" << p.x << ", " << p.y << ")";
         return os;
     }
@@ -95,7 +95,7 @@ struct pt2d {
         if constexpr (index == 1) return y;
     }
 
-    auto norm() -> pt2d& {
+    auto norm() -> P2& {
         if (auto len = mag(); len != 0) {
             *this *= (1.0 / len);
         }
@@ -104,72 +104,72 @@ struct pt2d {
 
     inline auto mag() const -> float { return std::sqrt(x * x + y * y); }
 
-    inline auto dist(const pt2d& p) const -> float { return (p - this).mag(); }
+    inline auto dist(const P2& p) const -> float { return (p - this).mag(); }
 
-    inline auto dot(const pt2d& p) const -> float { return x * p.x + y * p.y; }
+    inline auto dot(const P2& p) const -> float { return x * p.x + y * p.y; }
 
-    inline auto cross(const pt2d& p) const -> pt2d { return pt2d(x * p.y, y * p.x); }
+    inline auto cross(const P2& p) const -> P2 { return P2(x * p.y, y * p.x); }
 };
 
 template <typename T>
-struct pt3d {
+struct P3 {
     T x{}, y{}, z{};
 
-    pt3d(T x, T y, T z) : x(x), y(y), z(z) {}
-    pt3d(const pt3d& p) = default;
-    pt3d(pt3d&& p) noexcept = default;
+    P3(T x, T y, T z) : x(x), y(y), z(z) {}
+    P3(const P3& p) = default;
+    P3(P3&& p) noexcept = default;
 
-    auto operator=(const pt3d& p) -> pt3d& {
+    auto operator=(const P3& p) -> P3& {
         x = p.x, y = p.y, z = p.z;
         return *this;
     }
-    auto operator<=>(const pt3d& p) const = default;
+    auto operator<=>(const P3& p) const = default;
 
-    auto operator+(const pt3d& p) const -> pt3d { return pt3d(x + p.x, y + p.y, z + p.z); }
-    auto operator-(const pt3d& p) const -> pt3d { return pt3d(x - p.x, y - p.y, z - p.z); }
-    auto operator*(const pt3d& p) const -> pt3d { return pt3d(x * p.x, y * p.y, z * p.z); }
-    auto operator/(const pt3d& p) const -> pt3d { return pt3d(x / p.x, y / p.y, z / p.z); }
+    auto operator+(const P3& p) const -> P3 { return P3(x + p.x, y + p.y, z + p.z); }
+    auto operator-(const P3& p) const -> P3 { return P3(x - p.x, y - p.y, z - p.z); }
+    auto operator*(const P3& p) const -> P3 { return P3(x * p.x, y * p.y, z * p.z); }
+    auto operator/(const P3& p) const -> P3 { return P3(x / p.x, y / p.y, z / p.z); }
 
-    auto operator+=(pt3d& p) -> pt3d& {
+    auto operator+=(P3& p) -> P3& {
         x += p.x, y += p.y, z += p.z;
         return *this;
     }
-    auto operator-=(pt3d& p) -> pt3d& {
+    auto operator-=(P3& p) -> P3& {
         x -= p.x, y -= p.y, z -= p.z;
         return *this;
     }
-    auto operator*=(pt3d& p) -> pt3d& {
+    auto operator*=(P3& p) -> P3& {
         x *= p.x, y *= p.y, z *= p.z;
         return *this;
     }
-    auto operator/=(pt3d& p) -> pt3d& {
+    auto operator/=(P3& p) -> P3& {
         x /= p.x, y /= p.y, z /= p.z;
         return *this;
     }
 
-    auto operator+(T s) const -> pt3d { return pt3d(x + s, y + s, z + s); }
-    auto operator-(T s) const -> pt3d { return pt3d(x - s, y - s, z - s); }
-    auto operator*(T s) const -> pt3d { return pt3d(x * s, y * s, z * s); }
-    auto operator/(T s) const -> pt3d { return pt3d(x / s, y / s, z / s); }
+    auto operator+(T s) const -> P3 { return P3(x + s, y + s, z + s); }
+    auto operator-(T s) const -> P3 { return P3(x - s, y - s, z - s); }
+    auto operator*(T s) const -> P3 { return P3(x * s, y * s, z * s); }
+    auto operator/(T s) const -> P3 { return P3(x / s, y / s, z / s); }
 
-    auto operator+=(T s) -> pt3d& {
+    auto operator+=(T s) -> P3& {
         x += s, y += s, z += s;
         return *this;
     }
-    auto operator-=(T s) -> pt3d& {
+    auto operator-=(T s) -> P3& {
         x -= s, y -= s, z -= s;
         return *this;
     }
-    auto operator*=(T s) -> pt3d& {
+    auto operator*=(T s) -> P3& {
         x *= s, y *= s, z *= s;
         return *this;
     }
-    auto operator/=(T s) -> pt3d& {
+    auto operator/=(T s) -> P3& {
         x /= s, y /= s, z /= s;
         return *this;
     }
 
-    friend auto operator<<(std::ostream& os, const pt3d& p) -> std::ostream& {
+    friend auto operator<<(std::ostream& os, const P3& p) -> std::ostream& {
         os << "(" << p.x << ", " << p.y << ", " << p.z << ")";
         return os;
     }
@@ -182,7 +182,7 @@ struct pt3d {
         if constexpr (index == 2) return z;
     }
 
-    auto norm() -> pt3d& {
+    auto norm() -> P3& {
         if (auto len = mag(); len != 0) {
             *this *= (1.0 / len);
         }
@@ -191,76 +191,76 @@ struct pt3d {
 
     inline auto mag() const -> float { return std::sqrt(x * x + y * y + z * z); }
 
-    inline auto dist(const pt3d& p) const -> float { return (p - this).mag(); }
+    inline auto dist(const P3& p) const -> float { return (p - this).mag(); }
 
-    inline auto dot(const pt3d& p) const -> float { return x * p.x + y * p.y + z * p.z; }
+    inline auto dot(const P3& p) const -> float { return x * p.x + y * p.y + z * p.z; }
 
-    inline auto cross(const pt3d& p) const -> pt3d {
-        return pt3d(y * p.z - z * p.y, -(x * p.z - z * p.x), x * p.y - y * p.x);
+    inline auto cross(const P3& p) const -> P3 {
+        return P3(y * p.z - z * p.y, -(x * p.z - z * p.x), x * p.y - y * p.x);
     }
 };
 
 /* -------------------------------- utility functions -------------------------------- */
 template <typename T>
-auto pt(T x, T y) -> pt2d<T> {
-    return pt2d(x, y);
+auto pt(T x, T y) -> P2<T> {
+    return P2(x, y);
 }
 template <typename T>
-auto pt(T x, T y, T z) -> pt3d<T> {
-    return pt3d(x, y, z);
+auto pt(T x, T y, T z) -> P3<T> {
+    return P3(x, y, z);
 }
 
 template <typename T>
-auto to_point(std::pair<T, T>&& pair) -> pt2d<T> {
+auto to_point(std::pair<T, T>&& pair) -> P2<T> {
     return pt(pair.first, pair.second);
 }
 template <typename T>
-auto to_point(std::tuple<T, T>&& tuple) -> pt2d<T> {
+auto to_point(std::tuple<T, T>&& tuple) -> P2<T> {
     return pt(get<0>(tuple), get<1>(tuple));
 }
 template <typename T>
-auto to_point(std::tuple<T, T, T>&& tuple) -> pt3d<T> {
+auto to_point(std::tuple<T, T, T>&& tuple) -> P3<T> {
     return pt(get<0>(tuple), get<1>(tuple), get<2>(tuple));
 }
 template <typename T>
-auto to_point(const std::pair<T, T>& pair) -> pt2d<T> {
+auto to_point(const std::pair<T, T>& pair) -> P2<T> {
     return pt(pair.first, pair.second);
 }
 template <typename T>
-auto to_point(const std::tuple<T, T>& tuple) -> pt2d<T> {
+auto to_point(const std::tuple<T, T>& tuple) -> P2<T> {
     return pt(get<0>(tuple), get<1>(tuple));
 }
 template <typename T>
-auto to_point(const std::tuple<T, T, T>& tuple) -> pt3d<T> {
+auto to_point(const std::tuple<T, T, T>& tuple) -> P3<T> {
     return pt(get<0>(tuple), get<1>(tuple), get<2>(tuple));
 }
 
 /* --------------------------------- hash functions ---------------------------------- */
 template <typename T>
-struct std::hash<pt2d<T>> {
-    auto operator()(const pt2d<T>& p) const noexcept -> size_t {
+struct std::hash<P2<T>> {
+    auto operator()(const P2<T>& p) const noexcept -> size_t {
         return std::hash<T>{}(p.x) ^ (std::hash<T>{}(p.y) << 1);
     }
 };
 template <typename T>
-struct std::hash<pt3d<T>> {
-    auto operator()(const pt3d<T>& p) const noexcept -> size_t {
+struct std::hash<P3<T>> {
+    auto operator()(const P3<T>& p) const noexcept -> size_t {
         return ((hash<T>{}(p.x) ^ (hash<T>{}(p.y) << 1)) >> 1) ^ (hash<T>{}(p.z) << 1);
     }
 };
 
 /* ------------------------------- structured bindings ------------------------------- */
 template <typename T>
-struct std::tuple_size<pt2d<T>> : std::integral_constant<size_t, 2> {};
+struct std::tuple_size<P2<T>> : std::integral_constant<size_t, 2> {};
 
 template <typename T>
-struct std::tuple_size<pt3d<T>> : std::integral_constant<size_t, 3> {};
+struct std::tuple_size<P3<T>> : std::integral_constant<size_t, 3> {};
 
 template <typename T, size_t index>
-struct std::tuple_element<index, pt2d<T>> {
+struct std::tuple_element<index, P2<T>> {
     using type = T;
 };
 template <typename T, size_t index>
-struct std::tuple_element<index, pt3d<T>> {
+struct std::tuple_element<index, P3<T>> {
     using type = T;
 };

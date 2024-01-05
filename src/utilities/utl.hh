@@ -126,5 +126,3 @@ auto max(const std::vector<T>& vec, Predicate pred) {
     return std::make_pair(max_val, vec[max_idx]);
 }
 } // namespace utl
-
-/* --------------------------------- print utilities --------------------------------- */

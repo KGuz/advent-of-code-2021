@@ -1,12 +1,11 @@
 #include "advent.hh"
-#include "itertools.hh"
 #include "utl.hh"
 #include <iostream>
 #include <map>
 
+namespace {
 using pt = std::pair<int, int>;
 
-namespace {
 auto parse_vents(const std::string& input) -> std::vector<std::pair<pt, pt>> {
     auto vents = utl::lines(input) | views::transform([](const auto& s) {
         auto tokens = utl::split(s, ' ');

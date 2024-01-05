@@ -35,7 +35,7 @@ function install_gcc {
 
 function set_gcc {
     sudo update-alternatives --set cc /usr/bin/gcc-13;
-    sudo update-alternatives --set c++ /usr/bin/gcc++-13;
+    sudo update-alternatives --set c++ /usr/bin/g++-13;
 }
 
 function install_gtest {
@@ -66,8 +66,33 @@ function install_cmake {
     rm cmake-3.27.7-linux-x86_64.sh;
 }
 
-function install_clang_format {
-    sudo apt install clang-format-17
+function install_clang_fmt {
+    sudo apt install clang-format-17 -y
+}
+
+function install_clang_lsp {
+    sudo apt install clangd-17 -y
+    
+    sudo update-alternatives --install /usr/bin/clangd clangd /usr/bin/clangd-17 100;
+    sudo update-alternatives --set clangd /usr/bin/clangd-17;
+}
+
+function setup_lsp {
+    settings='{
+    "clangd.path": "/usr/bin/clangd",
+    "clangd.arguments": [
+        "--background-index", 
+        "--compile-commands-dir=${workspaceFolder}/build/compile_commands.json"
+    ],
+    "clangd.fallbackFlags": [ 
+        "-std=c++2b",
+        "-I${workspaceFolder}/libs",
+        "-I${workspaceFolder}/src/advent",
+        "-I${workspaceFolder}/src/aoc",
+        "-I${workspaceFolder}/src/utilities",
+    ]
+}';
+    mkdir -p ./.vscode && (cd ./.vscode && echo "$settings" > settings.json);
 }
 
 function prepare {
@@ -75,13 +100,15 @@ function prepare {
     install_cmake;    
     install_gtest;
     install_gcc;
-    install_clang_format;
     install_clang;
-    set_gcc;
+    install_clang_fmt;
+    install_clang_lsp;
+    setup_lsp;
+    set_clang;
 }
 
 function build {
-    mkdir -p ./build && (cd ./build && cmake .. && make);
+    mkdir -p ./build && (cd ./build && cmake .. -DCMAKE_EXPORT_COMPILE_COMMANDS=1 && make);
 }
 
 function rebuild {
@@ -93,12 +120,12 @@ function run {
 }
 
 function format {
-    find src/ -iname *.hh -o -iname *.cc | xargs clang-format-17 -i -style=file:.clang-format
+    find src/ -iname *.hh -o -iname *.cc | xargs clang-format-17 -i -style=file:.clang-format --sort-includes --verbose 
 }
 
 function deactivate {
     export PS1=${PS1/"(sdk) "/}
-    unset -f install_clang set_clang install_gcc set_gcc install_gtest install_cmake install_clang_format prepare build rebuild run format deactivate
+    unset -f install_clang set_clang install_gcc set_gcc install_gtest install_cmake install_clang_fmt install_clang_lsp setup_lsp prepare build rebuild run format deactivate
 }
 
 export PS1="(sdk) $PS1"
